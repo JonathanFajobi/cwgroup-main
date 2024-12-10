@@ -1,0 +1,33 @@
+{
+  "api" : {
+    "users": [
+      {
+        "id": 1,
+        "username": "john_doe9",
+        "firstName": "John", 
+        "lastName": "Doe",
+        "email": "johndoe@gmail.com", 
+        "dob": "11/11/1998",
+        "passwordHash": "hashed_password_1",
+        "hobbies": [
+          "coding",
+          "reading"
+        ],
+        "friends": [
+          { "id": 2, "username": "DeviousLick7", "hobbies": ["Reading", "Swimming"], "age": 25, "matching": 0 }
+        ],
+        "friendRequests": {
+          "sent": [
+            { "id": 4, "username": "Unc", "hobbies": ["Reading", "Swimming"], "age": 33, "matching": 0 }
+          ],
+          "received": [
+            { "id": 3, "username": "Whiplashfrog6", "firstName": "Jake", "lastName": "Smith", "userId": 1 }
+          ]
+        }
+      }
+    ],
+    "hobbies": [
+      {"id": 1, "name": "Swimming"}
+    ]
+  }
+}
