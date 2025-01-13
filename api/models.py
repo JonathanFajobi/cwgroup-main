@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from datetime import date
 
 #Create your models here
 
@@ -13,7 +14,7 @@ class PageView(models.Model):
 class User(AbstractUser):
     name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(null=True, blank=True)
     hobbies = models.ManyToManyField('Hobby', related_name='users', blank=True)
 
     groups = models.ManyToManyField(

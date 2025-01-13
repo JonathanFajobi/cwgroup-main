@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpRequest, JsonResponse
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth.models import User
 
 
 def main_spa(request: HttpRequest) -> HttpResponse:
@@ -10,11 +11,13 @@ def main_spa(request: HttpRequest) -> HttpResponse:
 ''' View for logging in '''
 def login(request):
     if request.method == 'POST':
-        post_username = request.POST.get('username')
-        post_password = request.POST.get('password')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
-        user = authenticate(username=post_username, password=post_password)
+        user = authenticate(username=username, password=password)
+        print(username, password, user)
         if user is not None:
+            print('Correct login details')
             auth_login(request, user)
         else:
             print('Invalid login details')
