@@ -18,9 +18,9 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from django.http import HttpResponse
 
-from .views import main_spa, cars_api
+from . import views
 
 urlpatterns = [
-    path('api/cars/', cars_api, name='cars api'),
-    re_path(r'.*', main_spa),
+    path('login/', views.login, name="login"),
+    path('signup/', views.signup, name="signup"),
 ]

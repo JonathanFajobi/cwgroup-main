@@ -6,26 +6,8 @@ def main_spa(request: HttpRequest) -> HttpResponse:
     return render(request, 'api/spa/index.html', {})
 
 
-def cars_api(request):
-    return JsonResponse({
-        'cars': [
-            {
-                'make': 'Toyota',
-                'model': 'Corolla',
-                'year': 2010,
-                'color': 'red',
-            },
-            {
-                'make': 'Toyota',
-                'model': 'Camry',
-                'year': 2015,
-                'color': 'blue',
-            },
-            {
-                'make': 'Honda',
-                'model': 'Civic',
-                'year': 2012,
-                'color': 'black',
-            },
-        ]
-    })
+def login(request):
+    return render(request, 'api/spa/login.html')
+
+def signup(request):
+    return render(request, 'api/spa/signup.html')
