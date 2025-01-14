@@ -40,10 +40,11 @@ def signup(request):
             date_of_birth = request.POST.get('dob')
         )
 
-        selected_hobbies_ids = request.POST.get('habitats', [])
+        selected_hobbies_ids = request.POST.getlist('hobbies')
+        print(selected_hobbies_ids, " asdasdas")
         if selected_hobbies_ids:
-            selected_hobbies_ids = Hobby.objects.filter()
-            user.hobbies.set(selected_hobbies_ids)
+            selected_hobbies = Hobby.objects.filter(name__in=selected_hobbies_ids)
+            user.hobbies.set(selected_hobbies)
 
         print("Successfully created user")
         return JsonResponse(user.as_dict())
