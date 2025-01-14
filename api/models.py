@@ -30,6 +30,17 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'dob': self.date_of_birth,
+            'email': self.email,
+            'hobbies': [hobby.id for hobby in self.hobbies.all()]
+        }
 
 
 class Hobby(models.Model):
@@ -37,6 +48,20 @@ class Hobby(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class UserHobby(models.Model):
+    ''' Through class for link between User and Hobby '''
+
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    hobby = models.ForeignKey('Hobby', on_delete=models.CASCADE)
+
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'user': self.user,
+            'hobby': self.hobby
+        }  
 
 
 class FriendRequest(models.Model):
