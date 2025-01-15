@@ -49,6 +49,11 @@ class Hobby(models.Model):
     def __str__(self):
         return self.name
 
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'hobby_name': self.name
+        }
 
 class UserHobby(models.Model):
     ''' Through class for link between User and Hobby '''
