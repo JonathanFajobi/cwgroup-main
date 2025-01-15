@@ -1,10 +1,9 @@
 from django.http import HttpResponse, HttpRequest, JsonResponse
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.models import User
-from .models import User, Hobby, UserHobby
-import json
-
+from api.models import User, Hobby, UserHobby
+from django.shortcuts import redirect
 
 def main_spa(request: HttpRequest) -> HttpResponse:
     return render(request, 'api/spa/index.html', {})
@@ -21,10 +20,18 @@ def login(request):
         if user is not None:
             print('Correct login details')
             auth_login(request, user)
+            return redirect('http://localhost:5173/')
         else:
             print('Invalid login details')
 
     return render(request, 'api/spa/login.html')
+
+
+def logout_view(request):
+    if request.method == "POST":
+        logout(request)
+        return JsonResponse({"message": "Logged out successfully"}, status=200)
+    return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
 ''' View for signing up '''
@@ -41,10 +48,10 @@ def signup(request):
         )
 
         selected_hobbies_ids = request.POST.getlist('hobbies')
-        print(selected_hobbies_ids, " asdasdas")
         if selected_hobbies_ids:
             selected_hobbies = Hobby.objects.filter(name__in=selected_hobbies_ids)
             user.hobbies.set(selected_hobbies)
+            user.save()
 
         print("Successfully created user")
         return JsonResponse(user.as_dict())
