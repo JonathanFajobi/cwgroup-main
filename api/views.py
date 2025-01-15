@@ -62,6 +62,15 @@ def users(request):
     if request.method == 'GET':
         return
 
+
+''' API for list of hobbies'''
 def hobbies(request):
-    if request.method == 'GET':
-        return
+    if request.method == 'POST':
+        hobby = Hobby.objects.create(
+            name = request.POST.get('name')
+        )
+        return JsonResponse(hobby.as_dict())
+    
+    return JsonResponse({
+        'hobbies': [hobby.as_dict() for hobby in Hobby.objects.all()]
+    })
