@@ -37,8 +37,8 @@ class User(AbstractUser):
             'username': self.username,
             'first_name': self.first_name,
             'last_name': self.last_name,
-            'dob': self.date_of_birth,
             'email': self.email,
+            'dob': self.date_of_birth,
             'hobbies': [hobby.id for hobby in self.hobbies.all()]
         }
 

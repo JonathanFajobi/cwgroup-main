@@ -57,3 +57,11 @@ def signup(request):
         return JsonResponse(user.as_dict())
         
     return render(request, 'api/spa/signup.html')
+
+def users(request):
+    if request.method == 'GET':
+        return
+
+def hobbies(request):
+    if request.method == 'GET':
+        return
