@@ -1,4 +1,4 @@
-import { USERS, HOBBIES, base } from "./urls.ts";
+import { USER, USERS, HOBBIES, base } from "./urls.ts";
 import { RequestOptions } from "../types/index.ts";
 
 function fetchFromCookie(keyName: string): string {
@@ -61,7 +61,7 @@ const createRequest = (method: string, baseUrl: string) => async ({ qParams = {}
     return value;
 };
 
-const getCurrentUserInfo = createRequest('GET', USERS);
+const getCurrentUserInfo = createRequest('GET', USER);
 const getAllUsers = createRequest('GET', USERS);
 const getAllUsersByAge = createRequest('GET', USERS);
 const getAllUsersByMatchingHobbies = createRequest('GET', USERS);

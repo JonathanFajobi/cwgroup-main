@@ -58,10 +58,24 @@ def signup(request):
         
     return render(request, 'api/spa/signup.html')
 
+def user(request):
+    if request.method == 'GET':
+        toReturn = request.user.as_dict()
+        return JsonResponse(toReturn)
+
 def users(request):
     if request.method == 'GET':
-        return
+        users = User.objects.all()
+        users_data = [user.as_dict() for user in users]
+        return JsonResponse(users_data, safe=False)
 
 def hobbies(request):
-    if request.method == 'GET':
-        return
+    if request.method == 'POST':
+        hobby = Hobby.objects.create(
+            name = request.POST.get('name')
+        )
+        return JsonResponse(hobby.as_dict())
+
+    return JsonResponse({
+        'hobbies': [hobby.as_dict() for hobby in Hobby.objects.all()]
+    })
