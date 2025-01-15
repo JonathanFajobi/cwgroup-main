@@ -61,7 +61,7 @@ const createRequest = (method: string, baseUrl: string) => async ({ qParams = {}
     return value;
 };
 
-const getCurrentUserInfo = createRequest('GET', USERS)
+const getCurrentUserInfo = createRequest('GET', USERS);
 const getAllUsers = createRequest('GET', USERS);
 const getAllUsersByAge = createRequest('GET', USERS);
 const getAllUsersByMatchingHobbies = createRequest('GET', USERS);
