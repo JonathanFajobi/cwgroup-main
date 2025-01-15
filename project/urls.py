@@ -21,6 +21,7 @@ from django.http import HttpResponse
 
 urlpatterns = [
     path('', include('api.urls')),
+    path('', include('django.contrib.auth.urls')),
     path('health', lambda request: HttpResponse("OK")),
     path('admin/', admin.site.urls),
 ]

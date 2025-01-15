@@ -7,11 +7,15 @@ function fetchFromCookie(keyName: string): string {
 }
 
 async function logout() {
-    let baseUrl = base
+    let baseUrl = 'http://localhost:8000/'
     try {
         const res = await fetch(baseUrl + "logout/", {
             method: "POST",
             credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': fetchFromCookie('csrftoken'),
+            }
           });
         if (res.ok) {
             window.location.href = baseUrl
