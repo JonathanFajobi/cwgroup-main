@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpRequest, JsonResponse
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.models import User
 from api.models import User, Hobby, UserHobby
 from django.shortcuts import redirect
@@ -25,6 +25,13 @@ def login(request):
             print('Invalid login details')
 
     return render(request, 'api/spa/login.html')
+
+
+def logout_view(request):
+    if request.method == "POST":
+        logout(request)
+        return JsonResponse({"message": "Logged out successfully"}, status=200)
+    return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
 ''' View for signing up '''

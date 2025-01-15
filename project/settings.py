@@ -153,3 +153,9 @@ LOGIN_URL = '/login/'
 
 LOGIN_REDIRECT_URL = 'user_info'
 LOGOUT_REDIRECT_URL = 'login'
+
+
+CORS_ALLOW_CREDENTIALS = True
+SESSION_COOKIE_SECURE = False  # Set to True if using HTTPS
+CSRF_COOKIE_SECURE = False     # Set to True if using HTTPS
+CSRF_TRUSTED_ORIGINS = ["http://localhost:5173"]  # Frontend origin
