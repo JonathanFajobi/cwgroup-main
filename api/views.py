@@ -69,13 +69,15 @@ def users(request):
         users_data = [user.as_dict() for user in users]
         return JsonResponse(users_data, safe=False)
 
+
+''' API for list of hobbies'''
 def hobbies(request):
     if request.method == 'POST':
         hobby = Hobby.objects.create(
             name = request.POST.get('name')
         )
         return JsonResponse(hobby.as_dict())
-
+    
     return JsonResponse({
         'hobbies': [hobby.as_dict() for hobby in Hobby.objects.all()]
     })
