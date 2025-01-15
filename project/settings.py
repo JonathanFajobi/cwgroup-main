@@ -61,9 +61,15 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
+
+
+CORS_ALLOW_CREDENTIALS = True
+
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
+    'http://localhost:5173'
 ]
+CSRF_TRUSTED_ORIGINS = ['http://localhost:5173']
+
 
 ROOT_URLCONF = 'project.urls'
 
@@ -142,3 +148,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 INTERNAL_IPS = ['127.0.0.1']
 
 AUTH_USER_MODEL = 'api.User'
+
+LOGIN_URL = '/login/'
+
+LOGIN_REDIRECT_URL = 'user_info'
+LOGOUT_REDIRECT_URL = 'login'
