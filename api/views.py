@@ -30,7 +30,10 @@ def login(request):
 def logout_view(request):
     if request.method == "POST":
         logout(request)
-        return JsonResponse({"message": "Logged out successfully"}, status=200)
+        response = JsonResponse({"message": "Logged out successfully"}, status=200)
+        response.delete_cookie('sessionid')  # Deletes the default Django session cookie
+        response.delete_cookie('user_id')
+        return response
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
 
@@ -60,8 +63,9 @@ def signup(request):
 
 def user(request):
     if request.method == 'GET':
-        toReturn = request.user.as_dict()
-        return JsonResponse(toReturn)
+        if request.user.is_authenticated:
+            toReturn = request.user.as_dict()
+            return JsonResponse(toReturn)
 
 def users(request):
     if request.method == 'GET':

@@ -28,6 +28,7 @@
           }        
         }, 
         mounted() {
+          console.log(this.currentUser)
           this.saveUserWrapper()
         }
     })
