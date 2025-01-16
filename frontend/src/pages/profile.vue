@@ -66,7 +66,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject } from 'vue';
+import { defineComponent, inject, computed } from 'vue';
 import { User } from '../types';
 import { getProfile, updateProfile, getAllHobbies, addHobby, updatePassword } from '../api/api';
 import { toast } from 'vue3-toastify';
@@ -74,8 +74,9 @@ import 'vue3-toastify/dist/index.css';
 
 export default defineComponent({
   setup(){
-    const globalState = inject('globalState') as { user: User }
-    const currentUser = globalState.user
+    const globalState = inject('globalState') as { user: User; saveUser: () => void };
+    const currentUser = computed(() => globalState.user);
+
       return {
       currentUser
     }      

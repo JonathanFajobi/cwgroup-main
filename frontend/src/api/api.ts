@@ -113,8 +113,8 @@ const getAllUsers = createRequest('GET', USERS);
 const getAllUsersByAge = createRequest('GET', USERS);
 const getAllUsersByMatchingHobbies = createRequest('GET', USERS);
 
-const getProfile = createRequest('GET', USERS);
-const updateProfile = createRequest('PUT', USERS);
+const getProfile = createRequest('GET', USER);
+const updateProfile = createRequest('PUT', USER);
 
 const getAllPendingRequests = createRequest('GET', USERS);
 const rejectPendingRequest = createRequest('DELETE', USERS);
