@@ -39,9 +39,9 @@ class User(AbstractUser):
             'first_name': self.first_name,
             'last_name': self.last_name,
             'email': self.email,
-            'dob': self.date_of_birth.strftime('%Y-%m-%d') if self.date_of_birth else None,
+            'dob': self.date_of_birth,
             'hobbies': [hobby.id for hobby in self.hobbies.all()],
-            'matching': [user.id for user in self.matching_users.all()]
+            'matching': [self.matching_users.id for self in self.matching_users.all()]
         }
 
 

@@ -1,44 +1,32 @@
 import { USER, USERS, HOBBIES, base } from "./urls.ts";
 import { RequestOptions } from "../types/index.ts";
 
-function fetchFromCookie(keyName: string): any {
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith(`${keyName}=`));
-    
-    if (cookieValue) {
-        const decodedCookie = decodeURIComponent(cookieValue.split('=')[1]);
-        console.log("Decoded cookie:", decodedCookie);  // Add a log to check the cookie's value
-        try {
-            return JSON.parse(decodedCookie);  // Safely parse if it's valid JSON
-        } catch (error) {
-            console.error(`Error parsing cookie value: ${decodedCookie}`);
-            return null;
-        }
-    } else {
-        return null;
-    }
+function fetchFromCookie(name: string): string | null {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null;
 }
 
 
 async function logout() {
-    let baseUrl = 'http://localhost:8000/';
+    const baseUrl = 'http://127.0.0.1:8000/';
+    console.log(document.cookie)
     try {
+        const csrfToken = fetchFromCookie('csrftoken');
+        if (!csrfToken) {
+            throw new Error('CSRF token not found');
+        }
+        console.log('CSRF Token:', csrfToken);
         const res = await fetch(baseUrl + "logout/", {
             method: "POST",
             credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': fetchFromCookie('csrftoken'),
+                'X-CSRFToken': csrfToken, // Use csrfToken directly after the null check
             }
         });
-        
+        console.log(res);
         if (res.ok) {
-            // Optionally clear cookies manually
-            document.cookie = 'user_data=; Max-Age=-1; path=/'; // Clear user_data cookie
-            document.cookie = 'csrftoken=; Max-Age=-1; path=/'; // Clear csrftoken cookie
-            
-            window.location.href = baseUrl + "login/";
+            window.location.href = baseUrl;
         } else {
             console.error("Logout unsuccessful");
         }
@@ -47,7 +35,6 @@ async function logout() {
         return false;
     }
 }
-
 
 async function sendRequest(url: string, options: RequestInit, params: URLSearchParams): Promise<any> {
     try {
@@ -63,22 +50,30 @@ async function sendRequest(url: string, options: RequestInit, params: URLSearchP
     }
 }
 
-const createRequest = (method: string, baseUrl: string) => async ({ qParams = {}, body = null, id = null }: RequestOptions = {}): Promise<any> => {
+interface RequestOptions {
+    qParams?: Record<string, string>;
+    body?: any;
+    id?: string | null;
+}
 
+const createRequest = (method: string, baseUrl: string) => async ({ qParams = {}, body = null, id = null }: RequestOptions = {}): Promise<any> => {
     let token = fetchFromCookie('csrftoken');
     const url = `${baseUrl}${id ? `/${id}` : ''}`;
-    console.log(url)
-    const params = new URLSearchParams(qParams)
+    const params = new URLSearchParams(qParams);
+
+    // Ensure headers is typed correctly for TypeScript
+    const headers: Record<string, string> = {
+        'X-CSRFToken': token || '', // Provide an empty string if the token is not available
+        'Content-Type': 'application/json',
+    };
 
     const options: RequestInit = {
         method,
-        credentials: "include",
-        headers: {
-            'X-CSRFToken': token,
-            'Content-Type': 'application/json'
-        },
-        body: body ? JSON.stringify(body) : null
+        credentials: 'include',
+        headers,
+        body: body ? JSON.stringify(body) : null,
     };
+
     const value = await sendRequest(url, options, params);
     return value;
 };
