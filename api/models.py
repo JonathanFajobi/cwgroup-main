@@ -40,7 +40,7 @@ class User(AbstractUser):
             'last_name': self.last_name,
             'email': self.email,
             'dob': self.date_of_birth,
-            'hobbies': [hobby.id for hobby in self.hobbies.all()],
+            'hobbies': [hobby.name for hobby in self.hobbies.all()],
             'matching': [self.matching_users.id for self in self.matching_users.all()]
         }
 

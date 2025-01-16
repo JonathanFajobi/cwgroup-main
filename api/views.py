@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpRequest, JsonResponse
+from django.http import HttpResponse, HttpRequest, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.models import User
@@ -89,11 +89,14 @@ def user(request, user_id):
     user = User.objects.get(id=user_id)
 
     if request.method == 'GET':
-        print(request.user.is_authenticated)
+        print(request.user.is_authenticated, request.user)
         if request.user.is_authenticated:
-            return JsonResponse(user.as_dict())
-    return JsonResponse({})
-
+            if request.user.id == user_id:
+                return JsonResponse(user.as_dict())
+            else:
+                return HttpResponseForbidden("You are not authorized to view this data.")    
+        return HttpResponseForbidden("You need to log in to view this data.")
+    
 def users(request):
     if request.method == 'GET':
         users = User.objects.all()
@@ -104,8 +107,9 @@ def users(request):
 ''' API for list of hobbies'''
 def hobbies(request):
     if request.method == 'POST':
+        print(request.POST.get('hobby_name'), "ASOFNAOISFNAOINFOIASNFOIASNFOAISNFOASIFNAOISFNAOISFNASOFINASFOINAOSIFNAOSIFNAOISNFAOISFN")
         hobby = Hobby.objects.create(
-            name = request.POST.get('name')
+            name = request.POST.get('hobby_name')
         )
         return JsonResponse(hobby.as_dict())
     

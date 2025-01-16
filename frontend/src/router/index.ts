@@ -9,6 +9,7 @@ import Friends from '../pages/friends.vue';
 import Users from '../pages/users.vue';
 import Profile from '../pages/profile.vue';
 import PendingRequests from '../pages/PendingRequests.vue';
+import RegisterHobby from '../pages/RegisterHobby.vue';
 
 
 // 2. Define some routes
@@ -21,7 +22,8 @@ const router = createRouter({
         { path: '/friends/', name: 'Friends', component: Friends },
         { path: '/users/', name: 'Users', component: Users }, 
         { path: '/profile/', name: 'Profile', component: Profile },  
-        { path: '/request/', name: 'Requests', component: PendingRequests }
+        { path: '/request/', name: 'Requests', component: PendingRequests },
+        { path: '/register-hobby', name: 'Register Hobby', component: RegisterHobby}
         ]
     })
 

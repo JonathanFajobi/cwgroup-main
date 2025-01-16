@@ -6,8 +6,8 @@
       <div class="card-body">
         <div>
           <p class="mb-5"><strong>Username:</strong> {{ currentUser.username }}</p>
-          <p class="mb-5"><strong>First Name:</strong> {{ currentUser.firstName }}</p>
-          <p class="mb-5"><strong>Last Name:</strong> {{ currentUser.lastName }}</p>
+          <p class="mb-5"><strong>First Name:</strong> {{ currentUser.first_name }}</p>
+          <p class="mb-5"><strong>Last Name:</strong> {{ currentUser.last_name }}</p>
           <p class="mb-5"><strong>Email:</strong> {{ currentUser.email }}</p>
           <p class="mb-5"><strong>Date of Birth:</strong> {{ currentUser.dob }}</p>
           <p class="mb-5"><strong>Hobbies:</strong> {{ Array.from(currentUser.hobbies).join(', ') }}</p>
@@ -41,10 +41,13 @@
         <input type="text" class="form-control" id="hobbies" name="hobbies" v-model="hobbiesInput" @keydown.enter="addHobbyToDB">
         <small class="form-text text-muted">Press Enter to add a hobby</small>
         <select v-model="user.hobbies" multiple class="form-control">
-          <option v-for="(hobby, index) in Array.from(availableHobbies)" :key="index" :value="hobby">
-            {{ hobby }}
+          <option v-for="(hobby) in availableHobbies.hobbies" :key="hobby.id" :value="hobby.hobby_name">
+            {{ hobby.hobby_name }}
           </option>
         </select>
+      </div>
+      <div class="form-group">
+        <router-link to="/register-hobby">Register a new hobby</router-link>
       </div>
       <div class="form-group">
         <label for="password">Current Password</label>
