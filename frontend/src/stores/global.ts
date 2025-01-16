@@ -5,7 +5,7 @@ import { getCurrentUserInfo, fetchFromCookie } from '../api/api'
 export const useGlobal = defineStore('global', {
     state: () => ({
         user: {
-            id: 1, 
+            id: 16, 
             username: "Placeholder Username", 
             firstName: "Placeholder First Name", 
             lastName: "Placeholder Last Name",
@@ -17,11 +17,14 @@ export const useGlobal = defineStore('global', {
     }),  
     actions: {
         async saveUser() {
-            console.log("Saving user")
+            console.log("Saving user", this.user.id)
             if (this.user.id == null || this.user.id == undefined) {
+                console.log("afasifnaosifnasoifn")
                 const id = parseInt(fetchFromCookie("user_id"));
-                this.user = await getCurrentUserInfo({ id: String(id) }) as User;
+                this.user = await getCurrentUserInfo({ id: String(this.user.id) }) as User;
             }
+            const id = parseInt(fetchFromCookie("user_id"));
+            this.user = await getCurrentUserInfo({ id: String(this.user.id)} ) as User;
         }
     }
 })
