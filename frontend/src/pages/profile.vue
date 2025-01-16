@@ -6,8 +6,8 @@
       <div class="card-body">
         <div>
           <p class="mb-5"><strong>Username:</strong> {{ currentUser.username }}</p>
-          <p class="mb-5"><strong>First Name:</strong> {{ currentUser.firstName }}</p>
-          <p class="mb-5"><strong>Last Name:</strong> {{ currentUser.lastName }}</p>
+          <p class="mb-5"><strong>First Name:</strong> {{ currentUser.first_name }}</p>
+          <p class="mb-5"><strong>Last Name:</strong> {{ currentUser.last_name }}</p>
           <p class="mb-5"><strong>Email:</strong> {{ currentUser.email }}</p>
           <p class="mb-5"><strong>Date of Birth:</strong> {{ currentUser.dob }}</p>
           <p class="mb-5"><strong>Hobbies:</strong> {{ Array.from(currentUser.hobbies).join(', ') }}</p>

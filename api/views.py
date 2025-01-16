@@ -89,7 +89,7 @@ def user(request, user_id):
     user = User.objects.get(id=user_id)
 
     if request.method == 'GET':
-        print(request.user.is_authenticated)
+        print(request.user.is_authenticated, request.user)
         if request.user.is_authenticated:
             return JsonResponse(user.as_dict())
     return JsonResponse({})
