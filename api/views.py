@@ -139,6 +139,19 @@ def calculate_age(self):
         return age
     return None
 
+def get_users_by_age(request):
+    if request.method == 'GET':
+        users = User.objects.all()
+        users_data = [user.as_dict() for user in users]
+        for user in users_data:
+            user['age'] = calculate_age(user)
+        sorted_users = sort_users_by_value(users_data, 'age')
+        return JsonResponse(sorted_users, safe=False)
+
+def sort_users_by_value(users, value):
+    sorted_users = sorted(users, key=lambda x: (x[value] is None, x[value]))
+    return sorted_users
+
 ''' API for list of hobbies'''
 def hobbies(request):
     if request.method == 'POST':
