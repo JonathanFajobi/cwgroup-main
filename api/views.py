@@ -20,7 +20,7 @@ def login(request):
         if user is not None:
             print('Correct login details')
             auth_login(request, user)
-            return redirect('http://localhost:5173/')
+            return redirect('http://127.0.0.1:5173/')
         else:
             print('Invalid login details')
 
@@ -30,9 +30,8 @@ def login(request):
 def logout_view(request):
     if request.method == "POST":
         logout(request)
+        print("logout successful")
         response = JsonResponse({"message": "Logged out successfully"}, status=200)
-        response.delete_cookie('sessionid')  # Deletes the default Django session cookie
-        response.delete_cookie('user_id')
         return response
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
