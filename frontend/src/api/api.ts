@@ -121,42 +121,10 @@ async function registerNewHobby(data: {}): Promise<void> {
     }
 }
 
-async function getAllUsersByAge(startRange : number, endRange : number): Promise<any> {
-    const csrfToken = fetchFromCookie('csrftoken');
-    if (!csrfToken) {
-        throw new Error('CSRF token not found');
-    }
-
-    let data = {'startRange': startRange, 'endRange': endRange}
-
-    const url = `http://127.0.0.1:8000/users_by_age`;
-    const options: RequestInit = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken,
-        },
-        credentials: 'include',
-        body: JSON.stringify(data),
-    };
-
-    try {
-        const response = await fetch(url, options);
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error('Error updating profile:', errorData);
-            throw new Error('Failed to update profile');
-        }
-        return await response.json(); // Return the updated user data
-    } catch (error) {
-        console.error('Error in updateUserProfile:', error);
-        throw error;
-    }
-}
-
 
 const getCurrentUserInfo = createRequest('GET', USER);
 const getAllUsers = createRequest('GET', USERS);
+const getAllUsersByAge = createRequest('GET', USERS);
 const getAllUsersByMatchingHobbies = createRequest('GET', USERS);
 
 const getProfile = createRequest('GET', USER);

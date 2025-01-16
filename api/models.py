@@ -17,7 +17,6 @@ class User(AbstractUser):
     date_of_birth = models.DateField(null=True, blank=True)
     hobbies = models.ManyToManyField('Hobby', related_name='users', blank=True)
     matching_users = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='matched_by')
-    age = models.CharField(max_length=3, default=0)
 
     groups = models.ManyToManyField(
         'auth.Group',
@@ -42,8 +41,7 @@ class User(AbstractUser):
             'email': self.email,
             'dob': self.date_of_birth,
             'hobbies': [hobby.name for hobby in self.hobbies.all()],
-            'matching': [self.matching_users.id for self in self.matching_users.all()],
-            'age': 0
+            'matching': [self.matching_users.id for self in self.matching_users.all()]
         }
 
 
