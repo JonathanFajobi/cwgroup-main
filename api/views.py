@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpRequest, JsonResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpRequest, JsonResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.models import User
@@ -6,6 +6,7 @@ from api.models import User, Hobby, UserHobby
 from django.shortcuts import redirect
 import json
 from urllib.parse import quote
+from datetime import datetime
 
 def main_spa(request: HttpRequest) -> HttpResponse:
     return render(request, 'api/spa/index.html', {})
@@ -105,15 +106,25 @@ def user(request, user_id):
                 # Safely handle hobbies
                 if 'hobbies' in data and data['hobbies'] is not None:
                     if isinstance(data['hobbies'], list):  # Validate it's a list
+                        # Overwrite the user's hobbies with the new list
                         user.hobbies.set(data['hobbies'])
                     else:
                         return HttpResponseBadRequest("Hobbies must be a list of IDs.")
+                    
+                if 'date_of_birth' in data:
+                    if data['date_of_birth']:  # Only update if a valid date is provided
+                        try:
+                            user.date_of_birth = datetime.strptime(data['date_of_birth'], '%Y-%m-%d').date()
+                        except ValueError:
+                            return HttpResponseBadRequest("Invalid date format. Please use YYYY-MM-DD.")
+                    else:
+                        # Retain the current date_of_birth if not provided or invalid
+                        user.date_of_birth = user.date_of_birth
                 
                 if 'username' in data: user.username = data.get('username', user.username)
                 if 'first_name' in data: user.first_name = data.get('first_name', user.first_name)
                 if 'last_name' in data: user.last_name = data.get('last_name', user.last_name)
                 if 'email' in data: user.email = data.get('email', user.email)
-                if 'date_of_birth' in data: user.date_of_birth = data.get('date_of_birth', user.date_of_birth)
                 user.save()
                 return JsonResponse({"message": "Profile updated successfully."})
             except json.JSONDecodeError:
