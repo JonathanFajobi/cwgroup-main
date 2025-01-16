@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.models import User
 from api.models import User, Hobby, UserHobby
 from django.shortcuts import redirect
+import json
+from urllib.parse import quote
 
 def main_spa(request: HttpRequest) -> HttpResponse:
     return render(request, 'api/spa/index.html', {})
@@ -20,9 +22,32 @@ def login(request):
         if user is not None:
             print('Correct login details')
             auth_login(request, user)
-            return redirect('http://127.0.0.1:5173/')
+            
+            # Create a response to redirect to the frontend
+            response = redirect('http://127.0.0.1:5173/')
+
+            # Prepare the user's data to store in the cookie
+            user_data = {
+                'id': user.id,
+                'username': user.username,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'dob': user.date_of_birth.strftime('%Y-%m-%d') if user.date_of_birth else None,
+                'hobbies': [hobby.name for hobby in user.hobbies.all()],
+                'matching_users': [matched_user.id for matched_user in user.matching_users.all()]
+            }
+
+            # Serialize the user data as JSON
+            serialized_user_data = json.dumps(user_data)
+            encoded_user_data = quote(serialized_user_data)
+
+            # Set a new cookie with the user data
+            response.set_cookie('user_data', encoded_user_data, max_age=3600, secure=False, samesite='Lax')
+            return response
         else:
             print('Invalid login details')
+            
 
     return render(request, 'api/spa/login.html')
 
