@@ -6,6 +6,7 @@ function fetchFromCookie(name: string): string | null {
     return match ? decodeURIComponent(match[2]) : null;
 }
 
+
 async function logout() {
     const baseUrl = 'http://127.0.0.1:8000/';
     console.log(document.cookie)
@@ -25,7 +26,7 @@ async function logout() {
         });
         console.log(res);
         if (res.ok) {
-            window.location.href = baseUrl;
+            window.location.href = baseUrl + "login/";
         } else {
             console.error("Logout unsuccessful");
         }
