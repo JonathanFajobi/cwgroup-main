@@ -93,7 +93,7 @@ export default defineComponent({
     },
     async filterByAge() {
       if (this.startRange !== null && this.endRange !== null) {
-        this.users = await getAllUsersByAge({id: String(this.currentUser.id), body: { ageRangeStart: this.startRange, ageRangeEnd: this.endRange, offset: this.start, limit: this.end }});
+        this.users = await getAllUsersByAge(this.startRange, this.endRange);
       }
     },
     sortByHobbies() {

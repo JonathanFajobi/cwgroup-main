@@ -140,17 +140,29 @@ def calculate_age(self):
     return None
 
 def get_users_by_age(request):
-    if request.method == 'GET':
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        startRange = data.get('startRange')
+        endRange = data.get('endRange')
         users = User.objects.all()
         users_data = [user.as_dict() for user in users]
         for user in users_data:
             user['age'] = calculate_age(user)
-        sorted_users = sort_users_by_value(users_data, 'age')
+        sorted_users = sort_users_by_value(users_data, 'age', startRange, endRange)
         return JsonResponse(sorted_users, safe=False)
+    return JsonResponse({})
 
-def sort_users_by_value(users, value):
+def sort_users_by_value(users, value, startRange, endRange):
     sorted_users = sorted(users, key=lambda x: (x[value] is None, x[value]))
-    return sorted_users
+
+    filtered_users = [
+        user for user in sorted_users 
+        if user[value] is not None and startRange <= user[value] <= endRange
+    ]
+    
+    return filtered_users
+
+
 
 ''' API for list of hobbies'''
 def hobbies(request):
