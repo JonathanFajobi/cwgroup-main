@@ -1,12 +1,15 @@
 from django.http import HttpResponse, HttpRequest, JsonResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login as auth_login, logout
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
 from api.models import User, Hobby, UserHobby
 from django.shortcuts import redirect
 import json
 from urllib.parse import quote
-from datetime import date
+from datetime import date, datetime
 
 
 def main_spa(request: HttpRequest) -> HttpResponse:
@@ -192,3 +195,28 @@ def hobbies(request):
     return JsonResponse({
         'hobbies': [hobby.as_dict() for hobby in Hobby.objects.all()]
     })
+
+def update_password(request):
+    if request.method == 'PUT':
+        # Get the current user (assumed that user is authenticated)
+        user = request.user
+        
+        # Retrieve the current password and new password from the request body
+        data = json.loads(request.body)
+        current_password = data.get('currentPassword')
+        new_password = data.get('newPassword')
+
+        # Check if the current password matches
+        if not check_password(current_password, user.password):
+            return JsonResponse({'error': 'Current password is incorrect'}, status=400)
+
+        # Update the password
+        user.set_password(new_password)
+        user.save()
+
+        # Update the session to avoid logout
+        update_session_auth_hash(request, user)
+
+        return JsonResponse({'message': 'Password successfully updated'}, status=200)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)

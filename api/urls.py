@@ -27,5 +27,6 @@ urlpatterns = [
     path('user/<int:user_id>/', views.user, name='user'),
     path('users/', views.users, name='users'),
     path('users_by_age', views.get_users_by_age, name='users by age'),
-    path('hobbies', views.hobbies, name='hobbies')
+    path('hobbies', views.hobbies, name='hobbies'),
+    path('update-password/', views.update_password, name='update-password')
 ]

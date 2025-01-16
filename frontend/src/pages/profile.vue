@@ -68,7 +68,7 @@
 <script lang="ts">
 import { defineComponent, inject } from 'vue';
 import { User } from '../types';
-import { getProfile, updateUserProfile, getAllHobbies, addHobby, updatePassword } from '../api/api';
+import { getProfile, updateUserProfile, getAllHobbies, addHobby, updatePasswordRequest } from '../api/api';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
@@ -149,10 +149,10 @@ export default defineComponent({
     },
     async updatePassword() {
       try {
-        const success = await updatePassword({
-          id: String(this.user.id),
-          body: { currentPassword: this.currentPassword, newPassword: this.newPassword }
-        });
+        const success = await updatePasswordRequest(
+          String(this.user.id),
+          { currentPassword: this.currentPassword, newPassword: this.newPassword }
+        );
         if (success) {
           toast("Password successfully updated!", {
             type: 'success',

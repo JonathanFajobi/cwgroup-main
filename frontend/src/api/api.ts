@@ -154,6 +154,37 @@ async function getAllUsersByAge(startRange : number, endRange : number): Promise
     }
 }
 
+async function updatePasswordRequest(id: string, data: { currentPassword: string, newPassword: string }): Promise<any> {
+    const csrfToken = fetchFromCookie('csrftoken');
+    if (!csrfToken) {
+        throw new Error('CSRF token not found');
+    }
+
+    const url = `http://127.0.0.1:8000/update-password/`;
+    const options: RequestInit = {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+        body: JSON.stringify(data),
+    };
+
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error updating password:', errorData);
+            throw new Error('Failed to update password');
+        }
+        return await response.json(); // Return a success message or any relevant data
+    } catch (error) {
+        console.error('Error in updatePassword:', error);
+        throw error;
+    }
+}
+
 
 const getCurrentUserInfo = createRequest('GET', USER);
 const getAllUsers = createRequest('GET', USERS);
@@ -195,5 +226,6 @@ export {
     logout, 
     fetchFromCookie,
     updatePassword,
+    updatePasswordRequest,
     registerNewHobby
  };
