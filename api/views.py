@@ -6,7 +6,8 @@ from api.models import User, Hobby, UserHobby
 from django.shortcuts import redirect
 import json
 from urllib.parse import quote
-from datetime import datetime
+from datetime import date
+
 
 def main_spa(request: HttpRequest) -> HttpResponse:
     return render(request, 'api/spa/index.html', {})
@@ -135,7 +136,42 @@ def users(request):
     if request.method == 'GET':
         users = User.objects.all()
         users_data = [user.as_dict() for user in users]
+        for user in users_data:
+            user['age'] = calculate_age(user)
         return JsonResponse(users_data, safe=False)
+
+def calculate_age(self):
+    if self['dob']:
+        today = date.today()
+        age = today.year - self['dob'].year
+        if (today.month, today.day) < (self['dob'].month, self['dob'].day):
+            age -= 1
+        return age
+    return None
+
+def get_users_by_age(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        startRange = data.get('startRange')
+        endRange = data.get('endRange')
+        users = User.objects.all()
+        users_data = [user.as_dict() for user in users]
+        for user in users_data:
+            user['age'] = calculate_age(user)
+        sorted_users = sort_users_by_value(users_data, 'age', startRange, endRange)
+        return JsonResponse(sorted_users, safe=False)
+    return JsonResponse({})
+
+def sort_users_by_value(users, value, startRange, endRange):
+    sorted_users = sorted(users, key=lambda x: (x[value] is None, x[value]))
+
+    filtered_users = [
+        user for user in sorted_users 
+        if user[value] is not None and startRange <= user[value] <= endRange
+    ]
+    
+    return filtered_users
+
 
 
 ''' API for list of hobbies'''
