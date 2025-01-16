@@ -49,21 +49,30 @@ async function sendRequest(url: string, options: RequestInit, params: URLSearchP
     }
 }
 
-const createRequest = (method: string, baseUrl: string) => async ({ qParams = {}, body = null, id = null }: RequestOptions = {}): Promise<any> => {
+interface RequestOptions {
+    qParams?: Record<string, string>;
+    body?: any;
+    id?: string | null;
+}
 
+const createRequest = (method: string, baseUrl: string) => async ({ qParams = {}, body = null, id = null }: RequestOptions = {}): Promise<any> => {
     let token = fetchFromCookie('csrftoken');
     const url = `${baseUrl}${id ? `/${id}` : ''}`;
-    const params = new URLSearchParams(qParams)
+    const params = new URLSearchParams(qParams);
+
+    // Ensure headers is typed correctly for TypeScript
+    const headers: Record<string, string> = {
+        'X-CSRFToken': token || '', // Provide an empty string if the token is not available
+        'Content-Type': 'application/json',
+    };
 
     const options: RequestInit = {
         method,
-        credentials: "include",
-        headers: {
-            'X-CSRFToken': token,
-            'Content-Type': 'application/json'
-        },
-        body: body ? JSON.stringify(body) : null
+        credentials: 'include',
+        headers,
+        body: body ? JSON.stringify(body) : null,
     };
+
     const value = await sendRequest(url, options, params);
     return value;
 };
