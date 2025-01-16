@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, provide } from "vue";
+import { defineComponent, onMounted, provide } from "vue";
 import { logout } from "./api/api";
 import { RouterView } from "vue-router";
 import { useGlobal } from "./stores/global";

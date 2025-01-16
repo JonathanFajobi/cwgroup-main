@@ -85,14 +85,13 @@ def signup(request):
         
     return render(request, 'api/spa/signup.html')
 
-def user(request, user_id):
-    user = User.objects.get(id=user_id)
-
-    if request.method == 'GET':
-        print(request.user.is_authenticated)
-        if request.user.is_authenticated:
-            return JsonResponse(user.as_dict())
+def user(request):
+    print(request.user)
+    if request.user.is_authenticated:
+        toReturn = request.user.as_dict()
+        return JsonResponse(toReturn)
     return JsonResponse({})
+        
 
 def users(request):
     if request.method == 'GET':
