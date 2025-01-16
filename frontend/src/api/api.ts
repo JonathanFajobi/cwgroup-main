@@ -1,30 +1,37 @@
 import { USER, USERS, HOBBIES, base } from "./urls.ts";
 import { RequestOptions } from "../types/index.ts";
 
-function fetchFromCookie(keyName: string): string {
-    const cookieValue = document.cookie.split('; ').find(row => row.startsWith(`${keyName}=`));
-    return cookieValue ? cookieValue.split('=')[1] : '';
+function fetchFromCookie(name: string): string | null {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : null;
 }
 
 async function logout() {
-    let baseUrl = 'http://localhost:8000/'
+    const baseUrl = 'http://127.0.0.1:8000/';
+    console.log(document.cookie)
     try {
+        const csrfToken = fetchFromCookie('csrftoken');
+        if (!csrfToken) {
+            throw new Error('CSRF token not found');
+        }
+        console.log('CSRF Token:', csrfToken);
         const res = await fetch(baseUrl + "logout/", {
             method: "POST",
             credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': fetchFromCookie('csrftoken'),
+                'X-CSRFToken': csrfToken, // Use csrfToken directly after the null check
             }
-          });
+        });
+        console.log(res);
         if (res.ok) {
-            window.location.href = baseUrl
+            window.location.href = baseUrl;
         } else {
-            console.error("Logout unsuccessful")
+            console.error("Logout unsuccessful");
         }
     } catch (error) {
-        console.error(error)
-        return false
+        console.error(error);
+        return false;
     }
 }
 
