@@ -93,16 +93,10 @@ export default defineComponent({
   methods: {
     async loadProfile() {
       try {
-        // Populate the `user` object with data from `currentUser`, excluding hobbies.
+        const profile = await getProfile({ id: String(this.user.id) });
         this.user = {
-          username: this.currentUser.username,
-          firstName: this.currentUser.firstName,
-          lastName: this.currentUser.lastName,
-          email: this.currentUser.email,
-          dob: this.currentUser.dob
-            ? new Date(this.currentUser.dob).toISOString().split('T')[0]
-            : '',
-          hobbies: new Set(), // Hobbies will not be pre-filled.
+          ...profile,
+          hobbies: new Set(profile.hobbies)
         };
       } catch (error) {
         console.error('Error loading profile:', error);
