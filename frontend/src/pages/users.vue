@@ -25,6 +25,7 @@
         </tr>
       </thead>
       <tbody>
+        <p>{{users}}</p>
         <tr v-for="user in users" :key="user.id" >
           <td>{{ user.username }}</td>
           <td>{{ user.age }}</td>

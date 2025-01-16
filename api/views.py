@@ -6,6 +6,8 @@ from api.models import User, Hobby, UserHobby
 from django.shortcuts import redirect
 import json
 from urllib.parse import quote
+from datetime import date
+
 
 def main_spa(request: HttpRequest) -> HttpResponse:
     return render(request, 'api/spa/index.html', {})
@@ -101,8 +103,18 @@ def users(request):
     if request.method == 'GET':
         users = User.objects.all()
         users_data = [user.as_dict() for user in users]
+        for user in users_data:
+            user['age'] = calculate_age(user)
         return JsonResponse(users_data, safe=False)
 
+def calculate_age(self):
+    if self['dob']:
+        today = date.today()
+        age = today.year - self['dob'].year
+        if (today.month, today.day) < (self['dob'].month, self['dob'].day):
+            age -= 1
+        return age
+    return None
 
 ''' API for list of hobbies'''
 def hobbies(request):
