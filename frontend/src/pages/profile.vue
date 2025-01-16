@@ -47,6 +47,9 @@
         </select>
       </div>
       <div class="form-group">
+        <router-link to="/register-hobby">Register a new hobby</router-link>
+      </div>
+      <div class="form-group">
         <label for="password">Current Password</label>
         <input type="password" class="form-control" id="currentPassword" name="currentPassword" v-model="currentPassword">
       </div>

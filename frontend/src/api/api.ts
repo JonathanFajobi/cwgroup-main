@@ -1,4 +1,4 @@
-import { USER, USERS, HOBBIES, base } from "./urls.ts";
+import { USER, USERS, HOBBIES } from "./urls.ts";
 import { RequestOptions } from "../types/index.ts";
 
 function fetchFromCookie(name: string): string | null {
@@ -72,6 +72,42 @@ const createRequest = (method: string, baseUrl: string) => async ({ qParams = {}
     return value;
 };
 
+
+
+async function registerNewHobby(name: string): Promise<void> {
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('csrftoken='))
+      ?.split('=')[1];
+  
+    const body = {
+      name: name,
+    };
+  
+    try {
+      const response = await fetch('http://localhost:8000/hobbies', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': token || '',
+        },
+        body: JSON.stringify(body),
+        credentials: 'include',
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      console.log('Hobby registered successfully:', data);
+    } catch (error) {
+      console.error('Failed to register hobby:', error);
+    }
+  }
+
+
+
 const getCurrentUserInfo = createRequest('GET', USER);
 const getAllUsers = createRequest('GET', USERS);
 const getAllUsersByAge = createRequest('GET', USERS);
@@ -90,7 +126,7 @@ const sortFriendsByAge = createRequest('GET', USERS);
 const removeFriend = createRequest('DELETE', USERS)
 
 const getAllHobbies = createRequest('GET', HOBBIES)
-const addHobby = createRequest('POST', HOBBIES)
+const addHobby = createRequest('PUT', HOBBIES)
 
 const updatePassword = createRequest('PUT', `${USERS}/update-password`);
 
@@ -112,5 +148,6 @@ export {
     addHobby, 
     logout, 
     fetchFromCookie,
-    updatePassword
+    updatePassword,
+    registerNewHobby
  };

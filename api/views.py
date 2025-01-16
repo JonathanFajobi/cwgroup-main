@@ -107,8 +107,9 @@ def users(request):
 ''' API for list of hobbies'''
 def hobbies(request):
     if request.method == 'POST':
+        print(request.POST.get('hobby_name'), "ASOFNAOISFNAOINFOIASNFOIASNFOAISNFOASIFNAOISFNAOISFNASOFINASFOINAOSIFNAOSIFNAOISNFAOISFN")
         hobby = Hobby.objects.create(
-            name = request.POST.get('name')
+            name = request.POST.get('hobby_name')
         )
         return JsonResponse(hobby.as_dict())
     
