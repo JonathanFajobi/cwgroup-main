@@ -1,13 +1,27 @@
 import { USER, USERS, HOBBIES, base } from "./urls.ts";
 import { RequestOptions } from "../types/index.ts";
 
-function fetchFromCookie(keyName: string): string {
-    const cookieValue = document.cookie.split('; ').find(row => row.startsWith(`${keyName}=`));
-    return cookieValue ? cookieValue.split('=')[1] : '';
+function fetchFromCookie(keyName: string): any {
+    const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith(`${keyName}=`));
+    
+    // If the cookie is found, decode and parse it; otherwise, return null
+    if (cookieValue) {
+        const decodedCookie = decodeURIComponent(cookieValue.split('=')[1]);
+        try {
+            return JSON.parse(decodedCookie);  // safely parse the cookie value
+        } catch (error) {
+            console.error(`Error parsing cookie value: ${decodedCookie}`);
+            return null;
+        }
+    } else {
+        return null;
+    }
 }
 
 async function logout() {
-    let baseUrl = 'http://localhost:8000/'
+    let baseUrl = 'http://localhost:8000/';
     try {
         const res = await fetch(baseUrl + "logout/", {
             method: "POST",
@@ -16,17 +30,23 @@ async function logout() {
                 'Content-Type': 'application/json',
                 'X-CSRFToken': fetchFromCookie('csrftoken'),
             }
-          });
+        });
+        
         if (res.ok) {
-            window.location.href = baseUrl
+            // Optionally clear cookies manually
+            document.cookie = 'user_data=; Max-Age=-1; path=/'; // Clear user_data cookie
+            document.cookie = 'csrftoken=; Max-Age=-1; path=/'; // Clear csrftoken cookie
+            
+            window.location.href = baseUrl + "login/";
         } else {
-            console.error("Logout unsuccessful")
+            console.error("Logout unsuccessful");
         }
     } catch (error) {
-        console.error(error)
-        return false
+        console.error(error);
+        return false;
     }
 }
+
 
 async function sendRequest(url: string, options: RequestInit, params: URLSearchParams): Promise<any> {
     try {
@@ -46,6 +66,7 @@ const createRequest = (method: string, baseUrl: string) => async ({ qParams = {}
 
     let token = fetchFromCookie('csrftoken');
     const url = `${baseUrl}${id ? `/${id}` : ''}`;
+    console.log(url)
     const params = new URLSearchParams(qParams)
 
     const options: RequestInit = {

@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.models import User
 from api.models import User, Hobby, UserHobby
 from django.shortcuts import redirect
+import json
+from urllib.parse import quote
 
 def main_spa(request: HttpRequest) -> HttpResponse:
     return render(request, 'api/spa/index.html', {})
@@ -20,7 +22,29 @@ def login(request):
         if user is not None:
             print('Correct login details')
             auth_login(request, user)
-            return redirect('http://localhost:5173/')
+            
+            # Create a response to redirect to the frontend
+            response = redirect('http://localhost:5173/')
+            
+            # Prepare the user's data to store in the cookie
+            user_data = {
+                'id': user.id,
+                'username': user.username,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'dob': user.date_of_birth.strftime('%Y-%m-%d') if user.date_of_birth else None,
+                'hobbies': [hobby.name for hobby in user.hobbies.all()],
+                'matching_users': [matched_user.id for matched_user in user.matching_users.all()]
+            }
+
+            # Serialize the user data as JSON
+            serialized_user_data = json.dumps(user_data)
+            encoded_user_data = quote(serialized_user_data)
+
+            # Set a new cookie with the user data
+            response.set_cookie('user_data', encoded_user_data, max_age=3600, secure=False, samesite='Lax')
+            return response
         else:
             print('Invalid login details')
 
@@ -62,13 +86,16 @@ def signup(request):
     return render(request, 'api/spa/signup.html')
 
 def user(request, user_id):
-    user = User.objects.get(id=user_id)
-
-    if request.method == 'GET':
-        print(request.user.is_authenticated)
+    try:
+        user = User.objects.get(id=user_id)
         if request.user.is_authenticated:
-            return JsonResponse(user.as_dict())
-    return JsonResponse({})
+            user_data = user.as_dict()
+            print("User data to be sent:", user_data)  # Log to verify data
+            return JsonResponse(user_data)
+        else:
+            return JsonResponse({'error': 'User not authenticated'}, status=401)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
 
 def users(request):
     if request.method == 'GET':
