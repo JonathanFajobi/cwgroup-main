@@ -74,36 +74,22 @@ const createRequest = (method: string, baseUrl: string) => async ({ qParams = {}
 
 
 
-async function registerNewHobby(name: string): Promise<void> {
-    const token = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('csrftoken='))
-      ?.split('=')[1];
-  
-    const body = {
-      name: name,
-    };
-  
-    try {
-      const response = await fetch('http://localhost:8000/hobbies', {
+async function registerNewHobby(data: {}): Promise<void> {
+    let token = fetchFromCookie('csrftoken');
+    console.log('HOBBY NAME: ' + name);
+    
+    const response = await fetch('http://127.0.0.1:8000/hobbies', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': token || '',
+            'Content-Type': 'application/json',
+            'X-CSRFToken': token || '',
         },
-        body: JSON.stringify(body),
         credentials: 'include',
-      });
-  
-      if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
-      }
-  
-      const data = await response.json();
-      console.log('Hobby registered successfully:', data);
-    } catch (error) {
-      console.error('Failed to register hobby:', error);
-    }
+        body: JSON.stringify(data)
+    })
+
+    const newHobby = await response.json()
+    console.log(newHobby)
   }
 
 

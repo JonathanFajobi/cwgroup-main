@@ -130,11 +130,17 @@ def users(request):
 ''' API for list of hobbies'''
 def hobbies(request):
     if request.method == 'POST':
-        print(request.POST.get('hobby_name'), "ASOFNAOISFNAOINFOIASNFOIASNFOAISNFOASIFNAOISFNAOISFNASOFINASFOINAOSIFNAOSIFNAOISNFAOISFN")
-        hobby = Hobby.objects.create(
-            name = request.POST.get('hobby_name')
-        )
-        return JsonResponse(hobby.as_dict())
+        try:
+            data = json.loads(request.body)  # Parse JSON data
+            print(data)
+            hobby_name = data.get('hobbyName')  # Retrieve the hobby_name
+            if not hobby_name:  # Handle missing or empty hobby_name
+                return JsonResponse({"error": "Hobby name is required"}, status=400)
+            
+            hobby = Hobby.objects.create(name=hobby_name)
+            return JsonResponse(hobby.as_dict())
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data"}, status=400)
     
     return JsonResponse({
         'hobbies': [hobby.as_dict() for hobby in Hobby.objects.all()]

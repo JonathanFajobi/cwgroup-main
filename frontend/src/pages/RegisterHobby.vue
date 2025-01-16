@@ -37,7 +37,7 @@ import { registerNewHobby} from '../api/api'
         async submitNewHobby() {
             console.log("Registering new hobby", this.hobbyFormData.hobbyName);
             try {
-                await registerNewHobby(this.hobbyFormData.hobbyName);
+                await registerNewHobby(this.hobbyFormData);
                 console.log('Hobby added successfully');
             } catch (error) {
                 console.error('Error adding hobby:', error);
