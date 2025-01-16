@@ -97,6 +97,29 @@ def user(request, user_id):
                 return HttpResponseForbidden("You are not authorized to view this data.")    
         return HttpResponseForbidden("You need to log in to view this data.")
     
+    if request.method == 'PUT':
+        if request.user.is_authenticated and request.user.id == user_id:
+            try:
+                data = json.loads(request.body)
+                
+                # Safely handle hobbies
+                if 'hobbies' in data and data['hobbies'] is not None:
+                    if isinstance(data['hobbies'], list):  # Validate it's a list
+                        user.hobbies.set(data['hobbies'])
+                    else:
+                        return HttpResponseBadRequest("Hobbies must be a list of IDs.")
+                
+                if 'username' in data: user.username = data.get('username', user.username)
+                if 'first_name' in data: user.first_name = data.get('first_name', user.first_name)
+                if 'last_name' in data: user.last_name = data.get('last_name', user.last_name)
+                if 'email' in data: user.email = data.get('email', user.email)
+                if 'date_of_birth' in data: user.date_of_birth = data.get('date_of_birth', user.date_of_birth)
+                user.save()
+                return JsonResponse({"message": "Profile updated successfully."})
+            except json.JSONDecodeError:
+                return HttpResponseBadRequest("Invalid JSON format.")
+        return HttpResponseForbidden("You are not authorized to update this data.")
+    
 def users(request):
     if request.method == 'GET':
         users = User.objects.all()
