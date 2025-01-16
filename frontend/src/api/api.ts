@@ -18,7 +18,7 @@ async function logout() {
             }
           });
         if (res.ok) {
-            window.location.href = baseUrl
+            window.location.href = baseUrl + "login/";
         } else {
             console.error("Logout unsuccessful")
         }
