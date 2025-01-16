@@ -20,11 +20,11 @@ export const useGlobal = defineStore('global', {
             console.log("Saving user", this.user.id)
             if (this.user.id == null || this.user.id == undefined) {
                 console.log("afasifnaosifnasoifn")
-                const id = parseInt(fetchFromCookie("user_id"));
-                this.user = await getCurrentUserInfo({ id: String(this.user.id) }) as User;
+                const id = parseInt(fetchFromCookie("user_id") || "0");
+                this.user = await getCurrentUserInfo({ id: String(id) }) as User;
             }
-            const id = parseInt(fetchFromCookie("user_id"));
-            this.user = await getCurrentUserInfo({ id: String(this.user.id)} ) as User;
+            const id = parseInt(fetchFromCookie("user_id") || "0");
+            this.user = await getCurrentUserInfo({ id: String(id)} ) as User;
         }
     }
 })

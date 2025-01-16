@@ -49,12 +49,6 @@ async function sendRequest(url: string, options: RequestInit, params: URLSearchP
     }
 }
 
-interface RequestOptions {
-    qParams?: Record<string, string>;
-    body?: any;
-    id?: string | null;
-}
-
 const createRequest = (method: string, baseUrl: string) => async ({ qParams = {}, body = null, id = null }: RequestOptions = {}): Promise<any> => {
     let token = fetchFromCookie('csrftoken');
     const url = `${baseUrl}${id ? `/${id}` : ''}`;
