@@ -72,8 +72,6 @@ const createRequest = (method: string, baseUrl: string) => async ({ qParams = {}
     return value;
 };
 
-
-
 async function registerNewHobby(data: {}): Promise<void> {
     let token = fetchFromCookie('csrftoken');
     console.log('HOBBY NAME: ' + name);
@@ -92,6 +90,36 @@ async function registerNewHobby(data: {}): Promise<void> {
     console.log(newHobby)
   }
 
+  async function updateUserProfile(id: string, data: Record<string, any>): Promise<any> {
+    const csrfToken = fetchFromCookie('csrftoken');
+    if (!csrfToken) {
+        throw new Error('CSRF token not found');
+    }
+
+    const url = `http://127.0.0.1:8000/user/${id}/`;
+    const options: RequestInit = {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+        body: JSON.stringify(data),
+    };
+
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error updating profile:', errorData);
+            throw new Error('Failed to update profile');
+        }
+        return await response.json(); // Return the updated user data
+    } catch (error) {
+        console.error('Error in updateUserProfile:', error);
+        throw error;
+    }
+}
 
 
 const getCurrentUserInfo = createRequest('GET', USER);
@@ -122,7 +150,7 @@ export {
     getAllUsersByAge, 
     getAllUsersByMatchingHobbies, 
     getProfile, 
-    updateProfile, 
+    updateUserProfile, 
     getAllPendingRequests, 
     rejectPendingRequest, 
     acceptPendingRequest, 

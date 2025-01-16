@@ -66,17 +66,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, computed } from 'vue';
+import { defineComponent, inject } from 'vue';
 import { User } from '../types';
-import { getProfile, updateProfile, getAllHobbies, addHobby, updatePassword } from '../api/api';
+import { getProfile, updateUserProfile, getAllHobbies, addHobby, updatePassword } from '../api/api';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 
 export default defineComponent({
   setup(){
-    const globalState = inject('globalState') as { user: User; saveUser: () => void };
-    const currentUser = computed(() => globalState.user);
-
+    const globalState = inject('globalState') as { user: User }
+    const currentUser = globalState.user
       return {
       currentUser
     }      
@@ -104,17 +103,21 @@ export default defineComponent({
       }
     },
     async updateProfileWrapper() {
-      try {
-        await updateProfile({ 
-          id: String(this.user.id), 
-          body: { ...this.user, hobbies: Array.from(this.user.hobbies)  
-          } 
-        });
-        console.log('Profile updated successfully');
-      } catch (error) {
-        console.error('Error updating profile:', error);
-      }
-    },
+    try {
+      const updatedUser = await updateUserProfile(String(this.currentUser.id), { 
+        username: this.user.username,
+        first_name: this.user.firstName,
+        last_name: this.user.lastName,
+        email: this.user.email,
+        dob: this.user.dob,
+        hobbies: Array.from(this.user.hobbies || []), // Convert Set to Array if needed
+      });
+      console.log('Profile updated successfully:', updatedUser);
+      this.currentUser = updatedUser; // Update the local state if necessary
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
+  },
     async getAllHobbiesWrapper() {
       this.availableHobbies = await getAllHobbies()
     }, 
