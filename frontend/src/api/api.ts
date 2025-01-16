@@ -6,11 +6,11 @@ function fetchFromCookie(keyName: string): any {
         .split('; ')
         .find(row => row.startsWith(`${keyName}=`));
     
-    // If the cookie is found, decode and parse it; otherwise, return null
     if (cookieValue) {
         const decodedCookie = decodeURIComponent(cookieValue.split('=')[1]);
+        console.log("Decoded cookie:", decodedCookie);  // Add a log to check the cookie's value
         try {
-            return JSON.parse(decodedCookie);  // safely parse the cookie value
+            return JSON.parse(decodedCookie);  // Safely parse if it's valid JSON
         } catch (error) {
             console.error(`Error parsing cookie value: ${decodedCookie}`);
             return null;
@@ -19,6 +19,7 @@ function fetchFromCookie(keyName: string): any {
         return null;
     }
 }
+
 
 async function logout() {
     let baseUrl = 'http://localhost:8000/';
