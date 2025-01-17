@@ -10,9 +10,6 @@
           <input type="number" v-model="endRange" placeholder="End Age" class="form-control" />
         </div>
         </div>
-      <div class="col-auto">
-        <button class="btn btn-outline-primary" @click="sortByHobbies">Sort by Hobbies</button>
-      </div>
     </div>
     <div class="card" style="overflow:hidden; border-radius: 10px; margin-bottom: 1rem; border: none;">
     <table class="table table-hover">
@@ -57,7 +54,7 @@ import { defineComponent, inject } from 'vue';
 import { User } from '../types';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-import { getAllUsers, getAllUsersByAge, sendFriendRequest } from '../api/api';
+import { getAllUsers, getAllUsersByAge, sendFriendRequest, getCurrentUserInfo, fetchFromCookie } from '../api/api';
 
 export default defineComponent({
   setup() {
@@ -93,15 +90,16 @@ export default defineComponent({
     },
     async filterByAge() {
       if (this.startRange !== null && this.endRange !== null) {
-        this.users = await getAllUsersByAge(this.startRange, this.endRange);
+        const currentUser = JSON.parse(fetchFromCookie("user_data"))
+        const currentUserHobbies = currentUser.hobbies;
+        this.users = await getAllUsersByAge(this.startRange, this.endRange, currentUserHobbies);
       }
     },
-    sortByHobbies() {
-      for (const user of this.users) {
-        let matchingSet = new Set([...this.currentUser.hobbies ?? []])
-        user.matching = matchingSet.size 
-      }
-      this.users.sort((a, b) => a.matching - b.matching);
+    async sortByHobbies() {
+      console.log(fetchFromCookie("user_data"))
+      const currentUser = JSON.parse(fetchFromCookie("user_data"))
+      const currentUserHobbies = Object.assign({}, currentUser.hobbies);
+      console.log(currentUserHobbies)
     },
     sendRequest(userId: number, username: string) {
       sendFriendRequest({id: String(userId), body: this.currentUser}).then(() => {

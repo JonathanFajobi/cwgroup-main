@@ -19,7 +19,6 @@ export const useGlobal = defineStore('global', {
         async saveUser() {
             console.log("Saving user", this.user.id)
             if (this.user.id == null || this.user.id == undefined) {
-                console.log("afasifnaosifnasoifn")
                 const id = parseInt(fetchFromCookie("user_data") || "0");
                 this.user = await getCurrentUserInfo({ id: String(id) }) as User;
             }

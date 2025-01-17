@@ -121,13 +121,13 @@ async function registerNewHobby(data: {}): Promise<void> {
     }
 }
 
-async function getAllUsersByAge(startRange : number, endRange : number): Promise<any> {
+async function getAllUsersByAge(startRange : number, endRange : number, hobbies : string[]): Promise<any> {
     const csrfToken = fetchFromCookie('csrftoken');
     if (!csrfToken) {
         throw new Error('CSRF token not found');
     }
 
-    let data = {'startRange': startRange, 'endRange': endRange}
+    let data = {'startRange': startRange, 'endRange': endRange, 'hobbies': hobbies}
 
     const url = `http://127.0.0.1:8000/users_by_age`;
     const options: RequestInit = {
@@ -144,12 +144,12 @@ async function getAllUsersByAge(startRange : number, endRange : number): Promise
         const response = await fetch(url, options);
         if (!response.ok) {
             const errorData = await response.json();
-            console.error('Error updating profile:', errorData);
-            throw new Error('Failed to update profile');
+            console.error('Error fetching users by age:', errorData);
+            throw new Error('Failed to fetch users by age');
         }
-        return await response.json(); // Return the updated user data
+        return await response.json();
     } catch (error) {
-        console.error('Error in updateUserProfile:', error);
+        console.error('Error in fetching users by age:', error);
         throw error;
     }
 }
@@ -157,7 +157,6 @@ async function getAllUsersByAge(startRange : number, endRange : number): Promise
 
 const getCurrentUserInfo = createRequest('GET', USER);
 const getAllUsers = createRequest('GET', USERS);
-const getAllUsersByMatchingHobbies = createRequest('GET', USERS);
 
 const getProfile = createRequest('GET', USER);
 const updateProfile = createRequest('PUT', USER);
@@ -180,7 +179,6 @@ export {
     getCurrentUserInfo, 
     getAllUsers, 
     getAllUsersByAge, 
-    getAllUsersByMatchingHobbies, 
     getProfile, 
     updateUserProfile, 
     getAllPendingRequests, 
