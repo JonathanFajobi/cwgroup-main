@@ -81,14 +81,17 @@ def signup(request):
 
         selected_hobbies_ids = request.POST.getlist('hobbies')
         if selected_hobbies_ids:
-            selected_hobbies = Hobby.objects.filter(name__in=selected_hobbies_ids)
+            selected_hobbies = Hobby.objects.filter(id__in=selected_hobbies_ids)
             user.hobbies.set(selected_hobbies)
             user.save()
+            
+        response = redirect('http://127.0.0.1:8000/login/')
 
         print("Successfully created user")
-        return JsonResponse(user.as_dict())
+        return response
         
-    return render(request, 'api/spa/signup.html')
+    hobbies = Hobby.objects.all()  # Get all hobbies
+    return render(request, 'api/spa/signup.html', {'hobbies': hobbies})
 
 def user(request, user_id):
     user = User.objects.get(id=user_id)
