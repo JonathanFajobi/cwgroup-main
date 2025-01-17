@@ -103,13 +103,10 @@ export default defineComponent({
       console.log(currentUserHobbies)
     },
     sendRequest(userId: number, username: string) {
-      sendFriendRequest({id: String(userId), body: this.currentUser}).then(() => {
-        toast("Request sent!", {
-          autoClose: 1000
-        })
-      }).then(() => {
-        console.log(`Request sent to ${username} with ID: ${userId}`);
-      }).catch((err) => console.error(err))
+      console.log("attempting to send request to ", userId, username)
+      const currentUser = JSON.parse(fetchFromCookie("user_data"))
+      let friendRequestObj = {'senderId': currentUser.id, 'recipientId': userId, 'senderName': currentUser.username, 'recipientName': username}
+      sendFriendRequest(friendRequestObj)
     },
     changePage(page) {
       if (page >= 1 && page <= this.totalPages) {

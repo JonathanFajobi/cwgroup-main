@@ -1,30 +1,33 @@
 <template>
   <div class="container">
     <h1 class="mb-3">Requests</h1>
-    <div class="row" v-for="request in pendingRequests" :key="request.id">
-      <div class="col-8 align-self-center">
-        <h5>{{ request.username }}</h5>
-      </div>
-      <div class="col-auto">
-        <button class="btn btn-primary" @click="acceptRequest(request.id)" style="margin-right: '10px'">Accept</button>
-      </div>
-      <div class="col-auto">
-        <button class="btn btn-outline-primary" @click="rejectRequest(request.id)">Reject</button>
-      </div>
-    </div>
-    <nav>
-      <ul class="pagination">
-        <li class="page-item" :class="{ disabled: currentPage === 1 }">
-          <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">Previous</a>
-        </li>
-        <li class="page-item" v-for="page in totalPages" :key="page" :class="{ active: currentPage === page }">
-          <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
-        </li>
-        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-          <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">Next</a>
-        </li>
-      </ul>
-    </nav>
+    <table v-if="pendingRequests.length > 0" class="table table-hover">
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Status</th>
+        <th>Accept</th>
+        <th>Reject</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="(request, userId) in pendingRequests" :key="userId">
+        <td>{{ request.user_from.username }}</td>
+        <td>{{ request.is_accepted ? 'Accepted' : 'Pending' }}</td>
+        <td>
+          <button class="btn btn-success" @click="acceptRequest(request.user_to.id)">
+            Accept
+          </button>
+        </td>
+        <td>
+          <button class="btn btn-danger" @click="rejectRequest(request.user_to.id)">
+            Reject
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
   </div>
 </template>
 
@@ -33,7 +36,7 @@ import { defineComponent, inject } from 'vue';
 import { Request, User } from '../types';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-import { getAllPendingRequests, acceptPendingRequest, rejectPendingRequest } from '../api/api.ts';
+import { getAllPendingRequests, acceptPendingRequest, rejectPendingRequest, fetchFromCookie } from '../api/api.ts';
 
 export default defineComponent({
   setup(){
@@ -45,7 +48,7 @@ export default defineComponent({
   },
   data() {
     return {
-      pendingRequests: [] as Request[],
+      pendingRequests: {},
       currentPage: 1,
       requestsPerPage: 10,
     };
@@ -63,7 +66,9 @@ export default defineComponent({
   },
   methods: {
     async paginatedRequests() {
-      this.pendingRequests = await getAllPendingRequests({id: String(this.currentUser.id), body: {offset: this.start, limit: this.end }})
+      const currentUser = JSON.parse(fetchFromCookie("user_data"))
+      const currentUserHobbies = {'user_to_id': currentUser.id, 'user_to_name': currentUser.username};
+      this.pendingRequests = await getAllPendingRequests(currentUserHobbies)
     },
     async acceptRequest(userToAcceptId: number) {
       toast("New friend added!", {
@@ -84,6 +89,7 @@ export default defineComponent({
   },
   mounted() {
     this.paginatedRequests();
+    console.log(this.pendingRequests)
   },
 });
 </script>

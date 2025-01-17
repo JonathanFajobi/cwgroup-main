@@ -28,5 +28,7 @@ urlpatterns = [
     path('users/', views.users, name='users'),
     path('users_by_age', views.get_users_by_age, name='users by age'),
     path('hobbies', views.hobbies, name='hobbies'),
-    path('update-password/', views.update_password, name='update-password')
+    path('update-password/', views.update_password, name='update-password'),
+    path('send_friend_request', views.send_friend_request_view, name='send friend request'),
+    path('get_friend_requests', views.get_all_pending_requests, name='get all friend requests')
 ]
