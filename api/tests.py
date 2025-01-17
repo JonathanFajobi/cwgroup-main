@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.edge.service import Service as EdgeService
+from selenium.webdriver.support.ui import Select
 import time
 
 # Test class
@@ -29,63 +30,120 @@ class TestAppE2E:
     def accountCreationTest(self):
         """Test user signup process."""
         driver = self.driver
-        driver.get("http://localhost:8000/signup")
+        driver.get("http://localhost:8000/signup/")
         
         # Fill out the signup form
-        driver.find_element(By.NAME, "name").send_keys("Test User")
-        driver.find_element(By.NAME, "username").send_keys("testuser")
-        driver.find_element(By.NAME, "email").send_keys("testuser@example.com")
-        driver.find_element(By.NAME, "password").send_keys("testpassword")
-        driver.find_element(By.NAME, "confirm_password").send_keys("testpassword")
-        driver.find_element(By.NAME, "date_of_birth").send_keys("2000-01-01")
-        driver.find_element(By.ID, "signup-btn").click()
+        driver.find_element(By.ID, "username").send_keys("test0000")
+        driver.find_element(By.ID, "password").send_keys("test0000")
+        driver.find_element(By.ID, "first_name").send_keys("testttt")
+        driver.find_element(By.ID, "last_name").send_keys("testtttest")
+        driver.find_element(By.ID, "email").send_keys("test4@test.com")
+        driver.find_element(By.ID, "dob").send_keys("0101-20-01")
+        
+        dropdown = Select(driver.find_element(By.ID, "hobbies"))
+        dropdown.select_by_visible_text("swimming")
+        
+        driver.find_element(By.ID, "signupbutton").click()
 
-        time.sleep(3)  # Wait for signup process to complete
+        time.sleep(2)  # Wait for signup process to complete
 
         # Assert successful signup (e.g., redirect to login page)
-        assert "Login" in driver.title, "Signup failed or incorrect page redirection"
+        assert driver.current_url=="http://127.0.0.1:8000/login/", "Signup failed or incorrect page redirection"
+        print("Signup succeeded, and the user was redirected to the login page.")
 
     def loginTest(self):
         """Test user login process."""
         driver = self.driver
-        driver.get("http://localhost:8000/login")
+        driver.get("http://localhost:8000/login/")
         
         # Fill out the login form
-        driver.find_element(By.NAME, "username").send_keys("testuser")
-        driver.find_element(By.NAME, "password").send_keys("testpassword")
-        driver.find_element(By.ID, "login-btn").click()
+        driver.find_element(By.ID, "username").send_keys("test0000")
+        driver.find_element(By.ID, "password").send_keys("test0000")
+        driver.find_element(By.ID, "loginbutton").click()
 
-        time.sleep(3)  # Wait for login process to complete
+        time.sleep(2)  # Wait for login process to complete
 
         # Assert successful login (e.g., redirect to dashboard)
-        assert "Dashboard" in driver.title, "Login failed or incorrect page redirection"
+        assert driver.current_url=="http://127.0.0.1:5173/", "Login failed or incorrect page redirection"
 
-    def profileEditTest(self):
+    def editTest(self):
         """Test editing user profile."""
         driver = self.driver
-        driver.get("http://localhost:8000/login")
+        driver.get("http://localhost:8000/login/")
         
-        # Log in
-        driver.find_element(By.NAME, "username").send_keys("testuser")
-        driver.find_element(By.NAME, "password").send_keys("testpassword")
-        driver.find_element(By.ID, "login-btn").click()
-        
-        time.sleep(3)
+        # Fill out the login form
+        driver.find_element(By.ID, "username").send_keys("test0000")
+        driver.find_element(By.ID, "password").send_keys("test0000")
+        driver.find_element(By.ID, "loginbutton").click()
+
+        time.sleep(2)  # Wait for login process to complete
 
         # Navigate to profile page
-        driver.find_element(By.ID, "profile-link").click()
+        driver.find_element(By.ID, "profilebutton").click()
 
         # Edit profile details
-        driver.find_element(By.NAME, "name").clear()
-        driver.find_element(By.NAME, "name").send_keys("Updated Test User")
-        driver.find_element(By.ID, "save-profile-btn").click()
+        driver.find_element(By.ID, "username").clear()
+        driver.find_element(By.ID, "username").send_keys("test00001")
+        driver.find_element(By.ID, "firstName").clear()
+        driver.find_element(By.ID, "firstName").send_keys("tttttest")
+        driver.find_element(By.ID, "lastName").clear()
+        driver.find_element(By.ID, "lastName").send_keys("ttestttttest")
+        driver.find_element(By.ID, "email").clear()
+        driver.find_element(By.ID, "email").send_keys("ttest@ttestttttest.com")
+        driver.find_element(By.ID, "dob").clear()
+        driver.find_element(By.ID, "dob").send_keys("0202-20-02")
+        
+        dropdown = Select(driver.find_element(By.ID, "hobbiesupdate"))
+        dropdown.select_by_visible_text("cycling")
+        
+        update_button = driver.find_element(By.ID, "updateprofilebutton")
+        driver.execute_script("arguments[0].click();", update_button)
 
+        time.sleep(2)
+        
+        passwordButton = driver.find_element(By.ID, "updatepasswordbutton")
+        driver.execute_script("arguments[0].scrollIntoView();", passwordButton)
+        driver.find_element(By.ID, "currentPassword").clear()
+        driver.find_element(By.ID, "currentPassword").send_keys("test0000")
+        driver.find_element(By.ID, "newPassword").clear()
+        driver.find_element(By.ID, "newPassword").send_keys("test00001")
+        
+        driver.find_element(By.ID, "updatepasswordbutton").click()
+        
+        time.sleep(2)
+
+        driver.refresh()
+        
         time.sleep(3)
+        updated_name = driver.find_element(By.ID, "username").text  # Replace 'user-name' with the actual ID or selector
+        assert updated_name == "test0001", "Profile update failed: Name not updated on the page"
 
-        # Assert profile updated (e.g., check for success message or updated value)
-        assert "Profile updated" in driver.page_source, "Profile update failed"
+    def filterTest(self):
+        """Test viewing users."""
+        driver = self.driver
+        driver.delete_all_cookies()
+        driver.get("http://localhost:8000/login/")
+        
+        # Fill out the login form
+        driver.find_element(By.ID, "username").send_keys("test1")
+        driver.find_element(By.ID, "password").send_keys("test1")
+        driver.find_element(By.ID, "loginbutton").click()
 
-    # Add other test methods similarly...
+        time.sleep(2)  # Wait for login process to complete
+
+        # Navigate to profile page
+        driver.find_element(By.ID, "userbutton").click()
+        
+        initial_rows = driver.find_elements(By.XPATH, "//table[@id='userfiltertable']/tbody/tr")
+        
+        driver.find_element(By.ID, "startageinput").send_keys("5")
+        driver.find_element(By.ID, "endageinput").send_keys("10")
+        
+        time.sleep(2)
+        
+        filter_rows = driver.find_elements(By.XPATH, "//table[@id='userfiltertable']/tbody/tr")
+        
+        assert len(filter_rows) < len(initial_rows), "Filtering did not reduce the number of rows"
 
 
 # Run tests
@@ -94,11 +152,14 @@ if __name__ == "__main__":
 
     for browser in ["chrome", "firefox", "edge"]:  # Test across multiple browsers
         print(f"Running tests on {browser}...")
-        test_app.setup_method(browser)
+        test_app.setupMethod(browser)
         try:
-            test_app.test_account_creation()
-            test_app.test_login()
-            test_app.test_edit_profile()
-            # Call other test methods here...
+            #uncomment out the relevant tests that you wish to test
+            #please note some tests may return an error when run multiple times as the hardcoded values for user fields may already exist in the database
+            
+            #test_app.accountCreationTest()
+            test_app.loginTest()
+            #test_app.editTest()
+            #test_app.filterTest()
         finally:
-            test_app.teardown_method()
+            test_app.teardownMethod()

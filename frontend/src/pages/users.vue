@@ -6,13 +6,13 @@
       <div class="col-auto">
         <div class="input-group">
           <button class="btn btn-outline-primary" @click="filterByAge">Sort by Age</button>
-          <input type="number" v-model="startRange" placeholder="Start Age" class="form-control" />
-          <input type="number" v-model="endRange" placeholder="End Age" class="form-control" />
+          <input type="number" v-model="startRange" placeholder="Start Age" id="startageinput" class="form-control" />
+          <input type="number" v-model="endRange" placeholder="End Age" id="endageinput" class="form-control" />
         </div>
         </div>
     </div>
     <div class="card" style="overflow:hidden; border-radius: 10px; margin-bottom: 1rem; border: none;">
-    <table class="table table-hover">
+    <table class="table table-hover" id="userfiltertable">
       <thead>
         <tr>
           <th>Name</th>
@@ -68,7 +68,7 @@ export default defineComponent({
     return {
       users: [],  // Full list of users
       currentPage: 1,  // Current page number
-      usersPerPage: 4,  // Users to display per page
+      usersPerPage: 10,  // Users to display per page
       startPageRange: 0,
       endPageRange: 4,
       startRange: null,  // Starting index for users on the current page
