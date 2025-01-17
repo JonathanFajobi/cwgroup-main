@@ -10,6 +10,7 @@ from django.shortcuts import redirect
 import json
 from urllib.parse import quote
 from datetime import date, datetime
+from django.db.models import Q
 
 
 def main_spa(request: HttpRequest) -> HttpResponse:
@@ -114,9 +115,28 @@ def get_all_pending_requests(request):
 
         friend_requests_data = [request.as_dict() for request in pending_requests]
         return JsonResponse(friend_requests_data, safe=False)
+    
+    
+def get_all_friends(request):
+    if request.method == "GET":
+        user_id = request.user.id
+        all_friends = FriendRequest.objects.filter(
+            Q(user_from=user_id) | Q(user_to=user_id),
+            is_accepted=True)
+
+        friends = []
+
+        for friend_request in all_friends:
+            if friend_request.user_from.id == user_id:
+                friends.append(friend_request.user_to.as_dict())
+            elif friend_request.user_to.id == user_id:
+                friends.append(friend_request.user_from.as_dict())
+
+        return JsonResponse(friends, safe=False)
+
 
 def accept_friend_request(request, request_id):
-    if request.method == 'DELETE':
+    if request.method == 'PUT':
         friend_request = FriendRequest.objects.get(id=request_id)
 
         if friend_request.is_accepted:

@@ -31,6 +31,7 @@ urlpatterns = [
     path('update-password/', views.update_password, name='update-password'),
     path('send_friend_request', views.send_friend_request_view, name='send friend request'),
     path('get_friend_requests', views.get_all_pending_requests, name='get all friend requests'),
+    path('get_all_friends', views.get_all_friends, name='get all friends'),
     path('accept_friend_request/<int:request_id>/', views.accept_friend_request, name='accept friend request'),
     path('reject_friend_request/<int:request_id>/', views.reject_friend_request, name='reject friend request'),
 ]

@@ -1,14 +1,6 @@
 <template>
   <div class="container">
     <h1 class="mb-3">Friends</h1>
-    <div class="row mb-3">
-      <div class="col-auto">
-        <button class="btn btn-outline-primary" @click="sortByAge">Sort by Age</button>
-      </div>
-      <div class="col-auto">
-        <button class="btn btn-outline-primary  mr-3" @click="sortByHobbies">Sort by Hobbies</button>
-      </div>
-    </div>
     <div class="row" v-for="friend in friends" :key="friend.id">
       <div class="col-10">
         <h5>{{ friend.username }}</h5>
@@ -67,20 +59,11 @@ export default defineComponent({
   },
   methods: {
     async paginatedFriends() {
-      this.friends = await getAllFriends({id: String(this.currentUser.id), body: {offset: this.start, limit: this.end }})
-    },
-    async sortByAge() {
-      this.friends = await sortFriendsByAge({id: String(this.currentUser.id), body: {offset: this.start, limit: this.end }})
+      this.friends = await getAllFriends()
     },
     async removeFriendWrapper(id: number) {
       removeFriend({id: String(id) })
     }, 
-    sortByHobbies() {
-      for (const friend of this.friends) {
-        let matchingSet = new Set([...this.currentUser.hobbies ?? []].filter((hobby) => friend.hobbies.has(hobby) ) )
-        friend.matching = matchingSet.size 
-      }
-    },
     changePage(page: number) {
       if (page > 0 && page <= this.totalPages) {
         this.currentPage = page;

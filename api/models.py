@@ -88,3 +88,4 @@ class FriendRequest(models.Model):
             'user_to': {'id': self.user_to.id, 'username': self.user_to.username},
             'is_accepted': self.is_accepted
         }
+    
