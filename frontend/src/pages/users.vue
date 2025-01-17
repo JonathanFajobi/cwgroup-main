@@ -22,7 +22,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in users" :key="user.id" >
+        <tr v-for="user in paginatedUsers" :key="user.id">
           <td>{{ user.username }}</td>
           <td>{{ user.age }}</td>
           <td>{{ Array.from(user.hobbies).join(', ') }}</td>
@@ -66,23 +66,24 @@ export default defineComponent({
   },
   data() {
     return {
-      users: [] as any[],
-      currentPage: 1,
-      usersPerPage: 10,
-      startRange: null,
-      endRange: null
+      users: [],  // Full list of users
+      currentPage: 1,  // Current page number
+      usersPerPage: 4,  // Users to display per page
+      startPageRange: 0,
+      endPageRange: 4,
+      startRange: null,  // Starting index for users on the current page
+      endRange: null  // Ending index for users on the current page
     };
   },
   computed: {
-    start(): number {
-      return (Number(this.currentPage) - 1) * Number(this.usersPerPage)
+    paginatedUsers() {
+      this.startPageRange = (this.currentPage - 1) * this.usersPerPage;
+      this.endPageRange = this.startPageRange + this.usersPerPage;
+      return this.users.slice(this.startPageRange, this.endPageRange);
     },
-    end(): number {
-      return this.start + Number(this.usersPerPage)
-    },
-    totalPages(): number {
-      return Math.ceil(this.users.length / this.usersPerPage);
-    },
+    totalPages() {
+      return Math.ceil(this.users.length / this.usersPerPage);  // Total number of pages
+    }
   },
   methods: {
     async paginatedUsers() {
@@ -110,11 +111,11 @@ export default defineComponent({
         console.log(`Request sent to ${username} with ID: ${userId}`);
       }).catch((err) => console.error(err))
     },
-    changePage(page: number) {
-      if (page > 0 && page <= this.totalPages) {
+    changePage(page) {
+      if (page >= 1 && page <= this.totalPages) {
         this.currentPage = page;
       }
-    },
+    }
   },
   async mounted() {
     this.users = await getAllUsers()
