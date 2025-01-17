@@ -18,28 +18,28 @@
         <form @submit.prevent="updateProfileWrapper">
           <div class="form-group">
             <label for="username">Username</label>
-            <input type="text" class="form-control" id="username" name="username" v-model="user.username">
+            <input type="text" class="form-control" id="username" name="username" v-model="currentUser.username">
           </div>
           <div class="form-group">
             <label for="firstName">First Name</label>
-            <input type="text" class="form-control" id="firstName" name="firstName" v-model="user.firstName">
+            <input type="text" class="form-control" id="firstName" name="firstName" v-model="currentUser.firstName">
           </div>
           <div class="form-group">
             <label for="lastName">Last Name</label>
-            <input type="text" class="form-control" id="lastName" name="lastName" v-model="user.lastName">
+            <input type="text" class="form-control" id="lastName" name="lastName" v-model="currentUser.lastName">
           </div>
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" v-model="user.email">
+            <input type="email" class="form-control" id="email" name="email" v-model="currentUser.email">
           </div>
           <div class="form-group">
             <label for="dob">Date of Birth</label>
-            <input type="date" class="form-control" id="dob" name="dob" v-model="user.dob">
+            <input type="date" class="form-control" id="dob" name="dob" v-model="currentUser.dob">
           </div>
           <div class="form-group">
             <label for="hobbies">Hobbies</label><br>
             <small class="form-text text-muted">Select Hobbies from the list below to add them to your profile</small>
-            <select v-model="user.hobbies" multiple class="form-control">
+            <select v-model="currentUser.hobbies" multiple class="form-control">
               <option v-for="(hobby) in availableHobbies.hobbies" :key="hobby.id" :value="hobby.id">
                 {{ hobby.hobby_name }}
               </option>
@@ -66,7 +66,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject } from 'vue';
+import { defineComponent, inject, computed } from 'vue';
 import { User } from '../types';
 import { getProfile, updateUserProfile, getAllHobbies, addHobby, updatePasswordRequest } from '../api/api';
 import { toast } from 'vue3-toastify';
@@ -74,11 +74,21 @@ import 'vue3-toastify/dist/index.css';
 
 export default defineComponent({
   setup() {
-    const globalState = inject('globalState') as { user: User }
-    const currentUser = globalState.user
+    const globalState = inject('globalState') as { user: User; saveUser: () => void };
+    const saveUserWrapper = () => {
+      globalState.saveUser();
+    };
+    const currentUser = computed(() => globalState.user);
+
     return {
-      currentUser
-    }
+      currentUser,
+      saveUserWrapper,
+    };
+  },
+  created() {
+    // Ensure user data is fetched on component creation
+    console.log("Fetching user data...");
+    this.saveUserWrapper();
   },
   data() {
     return {
@@ -115,12 +125,12 @@ export default defineComponent({
         console.log("const date_of_birth: " + dateOfBirth.toISOString().split('T')[0])
 
         const updatedUser = await updateUserProfile(String(this.currentUser.id), {
-          username: this.user.username,
-          first_name: this.user.firstName,
-          last_name: this.user.lastName,
-          email: this.user.email,
+          username: this.currentUser.username,
+          first_name: this.currentUser.firstName,
+          last_name: this.currentUser.lastName,
+          email: this.currentUser.email,
           date_of_birth: dateOfBirth ? dateOfBirth.toISOString().split('T')[0] : '',
-          hobbies: Array.from(this.user.hobbies || []), // Convert Set to Array if needed
+          hobbies: Array.from(this.currentUser.hobbies || []), // Convert Set to Array if needed
         });
         console.log('Profile updated successfully:', updatedUser);
         this.currentUser = updatedUser; // Update the local state if necessary
