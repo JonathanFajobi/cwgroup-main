@@ -83,7 +83,9 @@ class FriendRequest(models.Model):
     
     def as_dict(self):
         return {
+            'id': self.id,
             'user_from': {'id': self.user_from.id, 'username': self.user_from.username},
             'user_to': {'id': self.user_to.id, 'username': self.user_to.username},
             'is_accepted': self.is_accepted
         }
+    

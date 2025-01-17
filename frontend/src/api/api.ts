@@ -219,6 +219,96 @@ async function updatePasswordRequest(id: string, data: { currentPassword: string
     }
 }
 
+async function acceptPendingRequest(id: number): Promise<any> {
+    const csrfToken = fetchFromCookie('csrftoken');
+    if (!csrfToken) {
+        throw new Error('CSRF token not found');
+    }
+
+    const url = `http://127.0.0.1:8000/accept_friend_request/${id}/`;
+    const options: RequestInit = {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+    };
+
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error accepting friend request:', errorData);
+            throw new Error('Failed to accept friend request');
+        }
+        return await response.json(); // Return a success message or any relevant data
+    } catch (error) {
+        console.error('Error in accepting friend request:', error);
+        throw error;
+    }
+}
+async function rejectPendingRequest(id: number): Promise<any> {
+    const csrfToken = fetchFromCookie('csrftoken');
+    if (!csrfToken) {
+        throw new Error('CSRF token not found');
+    }
+
+    const url = `http://127.0.0.1:8000/reject_friend_request/${id}/`;
+    const options: RequestInit = {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+    };
+
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error accepting friend request:', errorData);
+            throw new Error('Failed to accept friend request');
+        }
+        return await response.json(); // Return a success message or any relevant data
+    } catch (error) {
+        console.error('Error in accepting friend request:', error);
+        throw error;
+    }
+}
+
+
+async function getAllFriends(): Promise<any> {
+    const csrfToken = fetchFromCookie('csrftoken');
+    if (!csrfToken) {
+        throw new Error('CSRF token not found');
+    }
+
+    const url = `http://127.0.0.1:8000/get_all_friends`;
+    const options: RequestInit = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+    };
+
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error getting friends:', errorData);
+            throw new Error('Failed to fetch friends');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error in fetching friends:', error);
+        throw error;
+    }
+}
+
 
 
 
@@ -228,10 +318,6 @@ const getAllUsers = createRequest('GET', USERS);
 const getProfile = createRequest('GET', USER);
 const updateProfile = createRequest('PUT', USER);
 
-const rejectPendingRequest = createRequest('DELETE', USERS);
-const acceptPendingRequest = createRequest('POST', USERS);
-
-const getAllFriends = createRequest('GET', USERS);
 const sortFriendsByAge = createRequest('GET', USERS);
 const removeFriend = createRequest('DELETE', USERS)
 

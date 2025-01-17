@@ -15,12 +15,12 @@
         <td>{{ request.user_from.username }}</td>
         <td>{{ request.is_accepted ? 'Accepted' : 'Pending' }}</td>
         <td>
-          <button class="btn btn-success" @click="acceptRequest(request.user_to.id)">
+          <button class="btn btn-success" @click="acceptRequest(request.id)">
             Accept
           </button>
         </td>
         <td>
-          <button class="btn btn-danger" @click="rejectRequest(request.user_to.id)">
+          <button class="btn btn-danger" @click="rejectRequest(request.id)">
             Reject
           </button>
         </td>
@@ -74,11 +74,11 @@ export default defineComponent({
       toast("New friend added!", {
         autoClose: 1000
       });
-      await acceptPendingRequest({ id: String(this.currentUser.id), body: userToAcceptId });
+      await acceptPendingRequest(userToAcceptId);
       this.paginatedRequests();
     },
     async rejectRequest(userToRejectId: number) {
-      await rejectPendingRequest({ id: String(this.currentUser.id), body: userToRejectId });
+      await rejectPendingRequest(userToRejectId);
       this.paginatedRequests()
     },
     changePage(page: number) {
