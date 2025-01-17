@@ -128,6 +128,10 @@ def users(request):
         users_data = [user.as_dict() for user in users]
         for user in users_data:
             user['age'] = calculate_age(user)
+        
+        username_of_requester = request.user
+        thisUser = find_user_by_name(username_of_requester)
+        sort_users_by_hobbies(thisUser['hobbies'], users_data)
         return JsonResponse(users_data, safe=False)
 
 def calculate_age(self):
@@ -144,11 +148,15 @@ def get_users_by_age(request):
         data = json.loads(request.body)
         startRange = data.get('startRange')
         endRange = data.get('endRange')
+        hobbies = data.get('hobbies')
         users = User.objects.all()
         users_data = [user.as_dict() for user in users]
+
         for user in users_data:
             user['age'] = calculate_age(user)
+
         sorted_users = sort_users_by_value(users_data, 'age', startRange, endRange)
+        sort_users_by_hobbies(hobbies, sorted_users)
         return JsonResponse(sorted_users, safe=False)
     return JsonResponse({})
 
@@ -161,6 +169,34 @@ def sort_users_by_value(users, value, startRange, endRange):
     ]
     
     return filtered_users
+
+def sort_users_by_hobbies(hobbies, users):
+    target_hobbies = set(hobbies)  # Convert target_hobbies to a set
+    users_with_common_hobbies = []
+
+    for user in users:
+        user_hobbies = set(user.get('hobbies', []))  # Convert user_hobbies to a set
+        print(user_hobbies, target_hobbies)
+        common_hobbies_count = len(user_hobbies & target_hobbies)  # Set intersection
+        user['common_hobbies'] = common_hobbies_count
+        users_with_common_hobbies.append(user)
+
+    users_with_common_hobbies.sort(key=lambda x: x['common_hobbies'], reverse=True)
+    
+    for user in users_with_common_hobbies:
+        user.pop('common_hobbies', None)
+
+    return users_with_common_hobbies
+
+
+def find_user_by_name(username):
+    users = User.objects.all()
+    users_data = [user.as_dict() for user in users]
+    for user in users_data:
+        if str(user['username']) == str(username):
+            return user
+
+
 
 
 
