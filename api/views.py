@@ -65,6 +65,7 @@ def logout_view(request):
         return response
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
+''' FRIEND REQUESTS VIEWS '''
 
 def send_friend_request_view(request):
     if request.method == "POST":
@@ -107,21 +108,36 @@ def get_all_pending_requests(request):
         data = json.loads(request.body)
         user_to_id = data.get('user_to_id')
 
-        # Get the user instance for which you want to fetch the friend requests
         user_to = User.objects.get(id=user_to_id)
-        print(user_to)
 
-        # Filter the pending friend requests where user_to is the specified user and is_accepted is False
         pending_requests = FriendRequest.objects.filter(user_to=user_to, is_accepted=False)
 
-        # Convert the friend requests to a dictionary format
         friend_requests_data = [request.as_dict() for request in pending_requests]
-        print(friend_requests_data)
-        # Return the data as a JSON response
         return JsonResponse(friend_requests_data, safe=False)
 
+def accept_friend_request(request, request_id):
+    if request.method == 'DELETE':
+        friend_request = FriendRequest.objects.get(id=request_id)
 
+        if friend_request.is_accepted:
+            return JsonResponse({'message': 'Friend request already accepted'}, status=400)
 
+        friend_request.is_accepted = True
+
+        friend_request.save()
+
+        return JsonResponse(friend_request.as_dict(), status=200)
+    
+def reject_friend_request(request, id):
+    if request.method == 'DELETE':
+        friend_request = FriendRequest.objects.get(id=id)
+
+        if friend_request.is_accepted:
+            return JsonResponse({'message': 'Friend request already accepted, cannot reject it'}, status=400)
+
+        friend_request.delete()
+
+        return JsonResponse({'message': 'Friend request rejected and deleted successfully'}, status=200)
 
 
 def check_if_friend_request_exists(new_friend_request, all_requests):
@@ -129,6 +145,7 @@ def check_if_friend_request_exists(new_friend_request, all_requests):
         if str(request) == str(new_friend_request):
             return True
     return False
+
 
 ''' View for signing up '''
 def signup(request):

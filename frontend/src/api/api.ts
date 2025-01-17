@@ -219,6 +219,65 @@ async function updatePasswordRequest(id: string, data: { currentPassword: string
     }
 }
 
+async function acceptPendingRequest(id: number): Promise<any> {
+    const csrfToken = fetchFromCookie('csrftoken');
+    if (!csrfToken) {
+        throw new Error('CSRF token not found');
+    }
+
+    const url = `http://127.0.0.1:8000/accept_friend_request/${id}/`;
+    const options: RequestInit = {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+    };
+
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error accepting friend request:', errorData);
+            throw new Error('Failed to accept friend request');
+        }
+        return await response.json(); // Return a success message or any relevant data
+    } catch (error) {
+        console.error('Error in accepting friend request:', error);
+        throw error;
+    }
+}
+async function rejectPendingRequest(id: number): Promise<any> {
+    const csrfToken = fetchFromCookie('csrftoken');
+    if (!csrfToken) {
+        throw new Error('CSRF token not found');
+    }
+
+    const url = `http://127.0.0.1:8000/reject_friend_request/${id}/`;
+    const options: RequestInit = {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+        },
+        credentials: 'include',
+    };
+
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error accepting friend request:', errorData);
+            throw new Error('Failed to accept friend request');
+        }
+        return await response.json(); // Return a success message or any relevant data
+    } catch (error) {
+        console.error('Error in accepting friend request:', error);
+        throw error;
+    }
+}
+
 
 
 
@@ -227,9 +286,6 @@ const getAllUsers = createRequest('GET', USERS);
 
 const getProfile = createRequest('GET', USER);
 const updateProfile = createRequest('PUT', USER);
-
-const rejectPendingRequest = createRequest('DELETE', USERS);
-const acceptPendingRequest = createRequest('POST', USERS);
 
 const getAllFriends = createRequest('GET', USERS);
 const sortFriendsByAge = createRequest('GET', USERS);
