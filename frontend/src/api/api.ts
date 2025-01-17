@@ -90,6 +90,40 @@ async function registerNewHobby(data: {}): Promise<void> {
     console.log(newHobby)
   }
 
+
+  async function sendFriendRequest(data: {}): Promise<void> {
+    let token = fetchFromCookie('csrftoken');
+    console.log(data)
+    const response = await fetch('http://127.0.0.1:8000/send_friend_request', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': token || '',
+        },
+        credentials: 'include',
+        body: JSON.stringify(data)
+    })
+
+    const newRequest = await response.json()
+    console.log(newRequest)
+  }
+
+  async function getAllPendingRequests(data: {}): Promise<void> {
+    let token = fetchFromCookie('csrftoken');
+    const response = await fetch('http://127.0.0.1:8000/get_friend_requests', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': token || '',
+        },
+        credentials: 'include',
+        body: JSON.stringify(data)
+    })
+
+    const newRequest = await response.json()
+    return newRequest
+  }
+
   async function updateUserProfile(id: string, data: Record<string, any>): Promise<any> {
     const csrfToken = fetchFromCookie('csrftoken');
     if (!csrfToken) {
@@ -186,16 +220,16 @@ async function updatePasswordRequest(id: string, data: { currentPassword: string
 }
 
 
+
+
 const getCurrentUserInfo = createRequest('GET', USER);
 const getAllUsers = createRequest('GET', USERS);
 
 const getProfile = createRequest('GET', USER);
 const updateProfile = createRequest('PUT', USER);
 
-const getAllPendingRequests = createRequest('GET', USERS);
 const rejectPendingRequest = createRequest('DELETE', USERS);
 const acceptPendingRequest = createRequest('POST', USERS);
-const sendFriendRequest = createRequest('POST', USERS)
 
 const getAllFriends = createRequest('GET', USERS);
 const sortFriendsByAge = createRequest('GET', USERS);
@@ -212,12 +246,12 @@ export {
     getAllUsersByAge, 
     getProfile, 
     updateUserProfile, 
-    getAllPendingRequests, 
+    getAllPendingRequests,
+    sendFriendRequest, 
     rejectPendingRequest, 
     acceptPendingRequest, 
     getAllFriends, 
     sortFriendsByAge, 
-    sendFriendRequest, 
     removeFriend,
     getAllHobbies, 
     addHobby, 

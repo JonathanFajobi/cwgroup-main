@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
-from api.models import User, Hobby, UserHobby
+from api.models import User, Hobby, FriendRequest
 from django.shortcuts import redirect
 import json
 from urllib.parse import quote
@@ -65,6 +65,70 @@ def logout_view(request):
         return response
     return JsonResponse({"error": "Invalid request method"}, status=405)
 
+
+def send_friend_request_view(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return HttpResponse("Invalid JSON", status=400)
+
+        user_from_name = data.get('senderName')
+        user_to_name = data.get('recipientName')
+        user_from_id = data.get('senderId')
+        user_to_id = data.get('recipientId')
+
+        request_string = f"{user_from_name} -> {user_to_name}"
+        print("Sender:", user_from_name)
+        print("Recipient:", user_to_name)
+
+        all_friend_requests = FriendRequest.objects.all()
+        all_friend_requests_data = [str(friend_request) for friend_request in all_friend_requests]
+
+        if check_if_friend_request_exists(request_string, all_friend_requests_data):
+            return HttpResponse("Friend request already exists.", status=400)
+
+        user_from = User.objects.filter(id=user_from_id).first()
+        user_to = User.objects.filter(id=user_to_id).first()
+
+        if not user_from or not user_to:
+            return HttpResponse("Invalid user IDs", status=400)
+
+        friend_request = FriendRequest.objects.create(
+            user_from=user_from,
+            user_to=user_to,
+            is_accepted=False
+        )
+
+        return JsonResponse({'id': friend_request.id, 'user_from': user_from.username, 'user_to': user_to.username, 'is_accepted': friend_request.is_accepted})
+    
+def get_all_pending_requests(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user_to_id = data.get('user_to_id')
+
+        # Get the user instance for which you want to fetch the friend requests
+        user_to = User.objects.get(id=user_to_id)
+        print(user_to)
+
+        # Filter the pending friend requests where user_to is the specified user and is_accepted is False
+        pending_requests = FriendRequest.objects.filter(user_to=user_to, is_accepted=False)
+
+        # Convert the friend requests to a dictionary format
+        friend_requests_data = [request.as_dict() for request in pending_requests]
+        print(friend_requests_data)
+        # Return the data as a JSON response
+        return JsonResponse(friend_requests_data, safe=False)
+
+
+
+
+
+def check_if_friend_request_exists(new_friend_request, all_requests):
+    for request in all_requests:
+        if str(request) == str(new_friend_request):
+            return True
+    return False
 
 ''' View for signing up '''
 def signup(request):
@@ -153,7 +217,7 @@ def users(request):
         
         username_of_requester = request.user
         thisUser = find_user_by_name(username_of_requester)
-        sorted_users = sort_users_by_hobbies(thisUser['hobbies'], users_data)
+        sorted_users = sort_users_by_hobbies(thisUser['hobbies'], users_data, request.user)
         return JsonResponse(sorted_users, safe=False)
 
 def calculate_age(self):
@@ -178,7 +242,7 @@ def get_users_by_age(request):
             user['age'] = calculate_age(user)
 
         sorted_users = sort_users_by_value(users_data, 'age', startRange, endRange)
-        sorted_users = sort_users_by_hobbies(hobbies, sorted_users)
+        sorted_users = sort_users_by_hobbies(hobbies, sorted_users, request.user)
         return JsonResponse(sorted_users, safe=False)
     return JsonResponse({})
 
@@ -192,13 +256,12 @@ def sort_users_by_value(users, value, startRange, endRange):
     
     return filtered_users
 
-def sort_users_by_hobbies(hobbies, users):
+def sort_users_by_hobbies(hobbies, users, this_user):
     target_hobbies = set(hobbies)  # Convert target_hobbies to a set
     users_with_common_hobbies = []
 
     for user in users:
         user_hobbies = set(user.get('hobbies', []))  # Convert user_hobbies to a set
-        print(user_hobbies, target_hobbies)
         common_hobbies_count = len(user_hobbies & target_hobbies)  # Set intersection
         user['common_hobbies'] = common_hobbies_count
         users_with_common_hobbies.append(user)
@@ -207,6 +270,14 @@ def sort_users_by_hobbies(hobbies, users):
     
     for user in users_with_common_hobbies:
         user.pop('common_hobbies', None)
+
+    print(users_with_common_hobbies)
+    index = 0
+    for user in users_with_common_hobbies:
+        if user['id'] == this_user.id:
+            print("made it here")
+            users_with_common_hobbies.pop(index)
+        index+=1
 
     return users_with_common_hobbies
 
