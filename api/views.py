@@ -1,12 +1,15 @@
-from django.http import HttpResponse, HttpRequest, JsonResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpRequest, JsonResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login as auth_login, logout
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import User
 from api.models import User, Hobby, UserHobby
 from django.shortcuts import redirect
 import json
 from urllib.parse import quote
-from datetime import date
+from datetime import date, datetime
 
 
 def main_spa(request: HttpRequest) -> HttpResponse:
@@ -78,14 +81,17 @@ def signup(request):
 
         selected_hobbies_ids = request.POST.getlist('hobbies')
         if selected_hobbies_ids:
-            selected_hobbies = Hobby.objects.filter(name__in=selected_hobbies_ids)
+            selected_hobbies = Hobby.objects.filter(id__in=selected_hobbies_ids)
             user.hobbies.set(selected_hobbies)
             user.save()
+            
+        response = redirect('http://127.0.0.1:8000/login/')
 
         print("Successfully created user")
-        return JsonResponse(user.as_dict())
+        return response
         
-    return render(request, 'api/spa/signup.html')
+    hobbies = Hobby.objects.all()  # Get all hobbies
+    return render(request, 'api/spa/signup.html', {'hobbies': hobbies})
 
 def user(request, user_id):
     user = User.objects.get(id=user_id)
@@ -107,15 +113,31 @@ def user(request, user_id):
                 # Safely handle hobbies
                 if 'hobbies' in data and data['hobbies'] is not None:
                     if isinstance(data['hobbies'], list):  # Validate it's a list
-                        user.hobbies.set(data['hobbies'])
+                        # Fetch hobbies by name
+                        hobbies_objects = Hobby.objects.filter(name__in=data['hobbies'])
+                        # If any hobby name doesn't exist, return an error
+                        if len(hobbies_objects) != len(data['hobbies']):
+                            return HttpResponseBadRequest("One or more hobby names are invalid.")
+                        
+                        # Overwrite the user's hobbies with the new list of Hobby objects
+                        user.hobbies.set(hobbies_objects)
                     else:
-                        return HttpResponseBadRequest("Hobbies must be a list of IDs.")
+                        return HttpResponseBadRequest("Hobbies must be a list of names.")
+                    
+                if 'date_of_birth' in data:
+                    if data['date_of_birth']:  # Only update if a valid date is provided
+                        try:
+                            user.date_of_birth = datetime.strptime(data['date_of_birth'], '%Y-%m-%d').date()
+                        except ValueError:
+                            return HttpResponseBadRequest("Invalid date format. Please use YYYY-MM-DD.")
+                    else:
+                        # Retain the current date_of_birth if not provided or invalid
+                        user.date_of_birth = user.date_of_birth
                 
                 if 'username' in data: user.username = data.get('username', user.username)
                 if 'first_name' in data: user.first_name = data.get('first_name', user.first_name)
                 if 'last_name' in data: user.last_name = data.get('last_name', user.last_name)
                 if 'email' in data: user.email = data.get('email', user.email)
-                if 'date_of_birth' in data: user.date_of_birth = data.get('date_of_birth', user.date_of_birth)
                 user.save()
                 return JsonResponse({"message": "Profile updated successfully."})
             except json.JSONDecodeError:
@@ -218,3 +240,28 @@ def hobbies(request):
     return JsonResponse({
         'hobbies': [hobby.as_dict() for hobby in Hobby.objects.all()]
     })
+
+def update_password(request):
+    if request.method == 'PUT':
+        # Get the current user (assumed that user is authenticated)
+        user = request.user
+        
+        # Retrieve the current password and new password from the request body
+        data = json.loads(request.body)
+        current_password = data.get('currentPassword')
+        new_password = data.get('newPassword')
+
+        # Check if the current password matches
+        if not check_password(current_password, user.password):
+            return JsonResponse({'error': 'Current password is incorrect'}, status=400)
+
+        # Update the password
+        user.set_password(new_password)
+        user.save()
+
+        # Update the session to avoid logout
+        update_session_auth_hash(request, user)
+
+        return JsonResponse({'message': 'Password successfully updated'}, status=200)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
