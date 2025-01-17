@@ -131,8 +131,8 @@ def users(request):
         
         username_of_requester = request.user
         thisUser = find_user_by_name(username_of_requester)
-        sort_users_by_hobbies(thisUser['hobbies'], users_data)
-        return JsonResponse(users_data, safe=False)
+        sorted_users = sort_users_by_hobbies(thisUser['hobbies'], users_data)
+        return JsonResponse(sorted_users, safe=False)
 
 def calculate_age(self):
     if self['dob']:
@@ -156,7 +156,7 @@ def get_users_by_age(request):
             user['age'] = calculate_age(user)
 
         sorted_users = sort_users_by_value(users_data, 'age', startRange, endRange)
-        sort_users_by_hobbies(hobbies, sorted_users)
+        sorted_users = sort_users_by_hobbies(hobbies, sorted_users)
         return JsonResponse(sorted_users, safe=False)
     return JsonResponse({})
 
