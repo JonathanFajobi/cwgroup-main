@@ -81,6 +81,7 @@ def send_friend_request_view(request):
         user_to_id = data.get('recipientId')
 
         request_string = f"{user_from_name} -> {user_to_name}"
+        request_string_alt = f"{user_to_name} -> {user_from_name}"
         print("Sender:", user_from_name)
         print("Recipient:", user_to_name)
 
@@ -88,6 +89,8 @@ def send_friend_request_view(request):
         all_friend_requests_data = [str(friend_request) for friend_request in all_friend_requests]
 
         if check_if_friend_request_exists(request_string, all_friend_requests_data):
+            return HttpResponse("Friend request already exists.", status=400)
+        if check_if_friend_request_exists(request_string_alt, all_friend_requests_data):
             return HttpResponse("Friend request already exists.", status=400)
 
         user_from = User.objects.filter(id=user_from_id).first()
@@ -116,7 +119,7 @@ def get_all_pending_requests(request):
         friend_requests_data = [request.as_dict() for request in pending_requests]
         return JsonResponse(friend_requests_data, safe=False)
     
-    
+
 def get_all_friends(request):
     if request.method == "GET":
         user_id = request.user.id
@@ -162,6 +165,7 @@ def reject_friend_request(request, request_id):
 
 def check_if_friend_request_exists(new_friend_request, all_requests):
     for request in all_requests:
+        print(request)
         if str(request) == str(new_friend_request):
             return True
     return False
