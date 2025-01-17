@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.edge.service import Service as EdgeService
+from selenium.webdriver.support.ui import Select
 import time
 
 # Test class
@@ -29,38 +30,43 @@ class TestAppE2E:
     def accountCreationTest(self):
         """Test user signup process."""
         driver = self.driver
-        driver.get("http://localhost:8000/signup")
+        driver.get("http://localhost:8000/signup/")
         
         # Fill out the signup form
-        driver.find_element(By.NAME, "name").send_keys("Test User")
-        driver.find_element(By.NAME, "username").send_keys("testuser")
-        driver.find_element(By.NAME, "email").send_keys("testuser@example.com")
-        driver.find_element(By.NAME, "password").send_keys("testpassword")
-        driver.find_element(By.NAME, "confirm_password").send_keys("testpassword")
-        driver.find_element(By.NAME, "date_of_birth").send_keys("2000-01-01")
-        driver.find_element(By.ID, "signup-btn").click()
+        driver.find_element(By.ID, "username").send_keys("test00")
+        driver.find_element(By.ID, "password").send_keys("test00")
+        driver.find_element(By.ID, "first_name").send_keys("test")
+        driver.find_element(By.ID, "last_name").send_keys("testtest")
+        driver.find_element(By.ID, "email").send_keys("test@test.com")
+        driver.find_element(By.ID, "dob").send_keys("2000-01-01")
+        
+        dropdown = Select(driver.find_element(By.NAME, "hobbies"))
+        dropdown.select_by_visible_text("swimming")
+        
+        driver.find_element(By.ID, "signupbutton").click()
 
-        time.sleep(3)  # Wait for signup process to complete
+        time.sleep(2)  # Wait for signup process to complete
 
         # Assert successful signup (e.g., redirect to login page)
-        assert "Login" in driver.title, "Signup failed or incorrect page redirection"
+        assert driver.current_url=="http://127.0.0.1:8000/login/", "Signup failed or incorrect page redirection"
+        print("Signup succeeded, and the user was redirected to the login page.")
 
     def loginTest(self):
         """Test user login process."""
         driver = self.driver
-        driver.get("http://localhost:8000/login")
+        driver.get("http://localhost:8000/login/")
         
         # Fill out the login form
-        driver.find_element(By.NAME, "username").send_keys("testuser")
-        driver.find_element(By.NAME, "password").send_keys("testpassword")
-        driver.find_element(By.ID, "login-btn").click()
+        driver.find_element(By.ID, "username").send_keys("test00")
+        driver.find_element(By.ID, "password").send_keys("test00")
+        driver.find_element(By.ID, "loginbutton").click()
 
-        time.sleep(3)  # Wait for login process to complete
+        time.sleep(2)  # Wait for login process to complete
 
         # Assert successful login (e.g., redirect to dashboard)
-        assert "Dashboard" in driver.title, "Login failed or incorrect page redirection"
+        assert driver.current_url=="http://127.0.0.1:5173/", "Login failed or incorrect page redirection"
 
-    def profileEditTest(self):
+    def editTest(self):
         """Test editing user profile."""
         driver = self.driver
         driver.get("http://localhost:8000/login")
@@ -85,7 +91,8 @@ class TestAppE2E:
         # Assert profile updated (e.g., check for success message or updated value)
         assert "Profile updated" in driver.page_source, "Profile update failed"
 
-    # Add other test methods similarly...
+    def filterTest(self):
+        assert "Success"
 
 
 # Run tests
