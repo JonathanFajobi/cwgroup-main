@@ -110,10 +110,16 @@ def user(request, user_id):
                 # Safely handle hobbies
                 if 'hobbies' in data and data['hobbies'] is not None:
                     if isinstance(data['hobbies'], list):  # Validate it's a list
-                        # Overwrite the user's hobbies with the new list
-                        user.hobbies.set(data['hobbies'])
+                        # Fetch hobbies by name
+                        hobbies_objects = Hobby.objects.filter(name__in=data['hobbies'])
+                        # If any hobby name doesn't exist, return an error
+                        if len(hobbies_objects) != len(data['hobbies']):
+                            return HttpResponseBadRequest("One or more hobby names are invalid.")
+                        
+                        # Overwrite the user's hobbies with the new list of Hobby objects
+                        user.hobbies.set(hobbies_objects)
                     else:
-                        return HttpResponseBadRequest("Hobbies must be a list of IDs.")
+                        return HttpResponseBadRequest("Hobbies must be a list of names.")
                     
                 if 'date_of_birth' in data:
                     if data['date_of_birth']:  # Only update if a valid date is provided

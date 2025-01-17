@@ -40,7 +40,7 @@
             <label for="hobbies">Hobbies</label><br>
             <small class="form-text text-muted">Select Hobbies from the list below to add them to your profile</small>
             <select v-model="currentUser.hobbies" multiple class="form-control">
-              <option v-for="(hobby) in availableHobbies.hobbies" :key="hobby.id" :value="hobby.id">
+              <option v-for="(hobby) in availableHobbies.hobbies" :key="hobby.id" :value="hobby.hobby_name">
                 {{ hobby.hobby_name }}
               </option>
             </select>
@@ -120,9 +120,11 @@ export default defineComponent({
     },
     async updateProfileWrapper() {
       try {
-        const dateOfBirth = this.user.dob instanceof Date ? this.user.dob : new Date(this.user.dob);
+        const dateOfBirth = this.currentUser.dob instanceof Date ? this.currentUser.dob : new Date(this.currentUser.dob);
         console.log("const dateOfBirth: " + dateOfBirth)
         console.log("const date_of_birth: " + dateOfBirth.toISOString().split('T')[0])
+
+        console.log("CURRENT HOBBIES: " + this.currentUser.hobbies)
 
         const updatedUser = await updateUserProfile(String(this.currentUser.id), {
           username: this.currentUser.username,
@@ -130,7 +132,7 @@ export default defineComponent({
           last_name: this.currentUser.lastName,
           email: this.currentUser.email,
           date_of_birth: dateOfBirth ? dateOfBirth.toISOString().split('T')[0] : '',
-          hobbies: Array.from(this.currentUser.hobbies || []), // Convert Set to Array if needed
+          hobbies: Array.from(this.currentUser.hobbies || []),
         });
         console.log('Profile updated successfully:', updatedUser);
         this.currentUser = updatedUser; // Update the local state if necessary
