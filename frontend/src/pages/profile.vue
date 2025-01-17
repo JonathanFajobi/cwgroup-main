@@ -5,7 +5,7 @@
       <div class="col-6">
         <div class="card-body">
           <div>
-            <p class="mb-5"><strong>Username:</strong> {{ currentUser.username }}</p>
+            <p class="mb-5" id="displayedusername"><strong>Username:</strong> {{ currentUser.username }}</p>
             <p class="mb-5"><strong>First Name:</strong> {{ currentUser.first_name }}</p>
             <p class="mb-5"><strong>Last Name:</strong> {{ currentUser.last_name }}</p>
             <p class="mb-5"><strong>Email:</strong> {{ currentUser.email }}</p>
@@ -39,7 +39,7 @@
           <div class="form-group">
             <label for="hobbies">Hobbies</label><br>
             <small class="form-text text-muted">Select Hobbies from the list below to add them to your profile</small>
-            <select v-model="currentUser.hobbies" multiple class="form-control">
+            <select v-model="currentUser.hobbies" multiple class="form-control" id="hobbiesupdate">
               <option v-for="(hobby) in availableHobbies.hobbies" :key="hobby.id" :value="hobby.hobby_name">
                 {{ hobby.hobby_name }}
               </option>
@@ -57,8 +57,8 @@
             <label for="newPassword">New Password</label>
             <input type="password" class="form-control" id="newPassword" name="newPassword" v-model="newPassword">
           </div>
-          <button type="button" class="btn btn-secondary" @click="updatePassword">Update Password</button>
-          <button type="submit" class="btn btn-primary mx-2">Update Profile</button>
+          <button type="button" class="btn btn-secondary" @click="updatePassword" id="updatepasswordbutton">Update Password</button>
+          <button type="submit" class="btn btn-primary mx-2" id="updateprofilebutton">Update Profile</button>
         </form>
       </div>
     </div>

@@ -4,7 +4,7 @@
             <div class="navbar-nav">
                 <router-link class="nav-link text-light" :to="{name: 'Home'}">Home <i class="bi bi-house-fill"></i></router-link>
                 <router-link class="nav-link text-light" :to="{name: 'Friends'}">Friends <i class="bi bi-heart-fill"></i></router-link>
-                <router-link class="nav-link text-light" :to="{name: 'Users'}" >Users <i class="bi bi-people"></i></router-link>
+                <router-link class="nav-link text-light" :to="{name: 'Users'}" id="userbutton">Users <i class="bi bi-people"></i></router-link>
                 <router-link class="nav-link text-light" :to="{name: 'Requests'}" >Requests <i class="bi bi-inbox-fill"></i></router-link>
                 <router-link class="nav-link text-light" :to="{name: 'Profile'}" >Profile</router-link>
                 <component v-if="currentUser.id">
