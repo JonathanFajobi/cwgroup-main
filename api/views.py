@@ -128,9 +128,9 @@ def accept_friend_request(request, request_id):
 
         return JsonResponse(friend_request.as_dict(), status=200)
     
-def reject_friend_request(request, id):
+def reject_friend_request(request, request_id):
     if request.method == 'DELETE':
-        friend_request = FriendRequest.objects.get(id=id)
+        friend_request = FriendRequest.objects.get(id=request_id)
 
         if friend_request.is_accepted:
             return JsonResponse({'message': 'Friend request already accepted, cannot reject it'}, status=400)
