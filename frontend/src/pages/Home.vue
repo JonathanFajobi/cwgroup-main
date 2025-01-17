@@ -9,7 +9,7 @@
     </button>
   </router-link>
   <router-link to="/profile/">
-    <button class="btn btn-outline-primary rounded mb-3 shadow home-button">
+    <button class="btn btn-outline-primary rounded mb-3 shadow home-button" id="profilebutton">
       <h2>Profile</h2>
     </button>
   </router-link>
